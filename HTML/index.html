@@ -1,1 +1,142 @@
 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorar | LookBook</title>
+    <link rel="stylesheet" href="../CSS/es.css">
+</head>
+<body>
+    <header class="linea-principal" id="linea-perfil">
+        <a href="index.html" class="contenedor-logo" id="contenedor-lobby">
+            LOOKBOOK
+        </a>
+        <nav class="linea-perfil" id="perfil-lobby">
+            <a href="index.html" class="activo">Explorar</a>
+            <a href="crear-pin.html">Crear</a>
+            <a href="mensajes.html">Mensajes</a>
+        </nav>
+        <div class="buscador-pines">
+            <form id="formulario-busqueda" action="index.html" method="GET">
+                <div class="contenedor-busqueda">
+                    <input
+                        type="text"
+                        id="busqueda"
+                        name="busqueda"
+                        class="input-busqueda"
+                        placeholder="Buscar ideas"
+                        autocomplete="off">
+                </div>
+            </form>
+        </div>
+        <div class="linea-perfil-foto" id="perfil-navegacion-derecha">
+            <a href="perfil.html" class="link-usuario" id="link-perfil-usuario" title="Mi Perfil">
+                <div class="avatar-placeholder">U</div>
+            </a>
+            <a href="bienvenida.html" class="boton-enviar-cerrar-sesion" id="btn-cerrar-sesion">
+                Cerrar Sesión
+            </a>
+        </div>
+    </header>
+
+    <main class="contenedor-principal" id="contenedor-explorar">
+        <section class="perfil-mosaico" id="mosaico-explorar">
+            <!-- Ejemplo de Pines -->
+            <article class="pin-tarjeta">
+                <div class="pin-imagen-contenedor">
+                    <img src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='600'%3E%3Crect width='100%25' height='100%25' fill='%231e1e24'/%3E%3Ctext x='50%25' y='50%25' fill='%238e8e93' font-family='sans-serif' font-weight='bold' font-size='20' text-anchor='middle'%3EDise%C3%B1o Minimalista%3C/text%3E%3C/svg%3E" alt="Pin de ejemplo" class="pin-imagen">
+                    <div class="pin-overlay">
+                        <button class="boton-guardar-pin">Guardar</button>
+                        <a href="ver-pin.html" class="pin-overlay-link-cover" aria-label="Ver detalle"></a>
+                    </div>
+                </div>
+                <div class="pin-info">
+                    <a href="ver-pin.html" class="pin-titulo-link">
+                        <h3 class="pin-titulo-mini">Diseño Minimalista</h3>
+                    </a>
+                </div>
+            </article>
+
+            <article class="pin-tarjeta">
+                <div class="pin-imagen-contenedor">
+                    <img src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='400'%3E%3Crect width='100%25' height='100%25' fill='%23272727'/%3E%3Ctext x='50%25' y='50%25' fill='%238e8e93' font-family='sans-serif' font-weight='bold' font-size='20' text-anchor='middle'%3EPerrito Feliz%3C/text%3E%3C/svg%3E" alt="Mascota" class="pin-imagen">
+                    <div class="pin-overlay">
+                        <button class="boton-guardar-pin">Guardar</button>
+                        <a href="ver-pin.html" class="pin-overlay-link-cover" aria-label="Ver detalle"></a>
+                    </div>
+                </div>
+                <div class="pin-info">
+                    <a href="ver-pin.html" class="pin-titulo-link">
+                        <h3 class="pin-titulo-mini">Perrito Feliz</h3>
+                    </a>
+                </div>
+            </article>
+
+            <article class="pin-tarjeta">
+                <div class="pin-imagen-contenedor">
+                    <img src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='550'%3E%3Crect width='100%25' height='100%25' fill='%23222831'/%3E%3Ctext x='50%25' y='50%25' fill='%238e8e93' font-family='sans-serif' font-weight='bold' font-size='20' text-anchor='middle'%3EInteriores Modernos%3C/text%3E%3C/svg%3E" alt="Arquitectura" class="pin-imagen">
+                    <div class="pin-overlay">
+                        <button class="boton-guardar-pin">Guardar</button>
+                        <a href="ver-pin.html" class="pin-overlay-link-cover" aria-label="Ver detalle"></a>
+                    </div>
+                </div>
+                <div class="pin-info">
+                    <a href="ver-pin.html" class="pin-titulo-link">
+                        <h3 class="pin-titulo-mini">Interiores Modernos</h3>
+                    </a>
+                </div>
+            </article>
+
+            <article class="pin-tarjeta">
+                <div class="pin-imagen-contenedor">
+                    <img src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='480'%3E%3Crect width='100%25' height='100%25' fill='%231b1b1b'/%3E%3Ctext x='50%25' y='50%25' fill='%238e8e93' font-family='sans-serif' font-weight='bold' font-size='20' text-anchor='middle'%3ESetup Gamer%3C/text%3E%3C/svg%3E" alt="Tecnología" class="pin-imagen">
+                    <div class="pin-overlay">
+                        <button class="boton-guardar-pin">Guardar</button>
+                        <a href="ver-pin.html" class="pin-overlay-link-cover" aria-label="Ver detalle"></a>
+                    </div>
+                </div>
+                <div class="pin-info">
+                    <a href="ver-pin.html" class="pin-titulo-link">
+                        <h3 class="pin-titulo-mini">Setup Gamer</h3>
+                    </a>
+                </div>
+            </article>
+
+            <article class="pin-tarjeta">
+                <div class="pin-imagen-contenedor">
+                    <img src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='650'%3E%3Crect width='100%25' height='100%25' fill='%23192229'/%3E%3Ctext x='50%25' y='50%25' fill='%238e8e93' font-family='sans-serif' font-weight='bold' font-size='20' text-anchor='middle'%3EPlaya Para%C3%ADso%3C/text%3E%3C/svg%3E" alt="Paisaje" class="pin-imagen">
+                    <div class="pin-overlay">
+                        <button class="boton-guardar-pin">Guardar</button>
+                        <a href="ver-pin.html" class="pin-overlay-link-cover" aria-label="Ver detalle"></a>
+                    </div>
+                </div>
+                <div class="pin-info">
+                    <a href="ver-pin.html" class="pin-titulo-link">
+                        <h3 class="pin-titulo-mini">Playa Paraíso</h3>
+                    </a>
+                </div>
+            </article>
+            
+            <article class="pin-tarjeta">
+                <div class="pin-imagen-contenedor">
+                    <img src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='420'%3E%3Crect width='100%25' height='100%25' fill='%232c1e1e'/%3E%3Ctext x='50%25' y='50%25' fill='%238e8e93' font-family='sans-serif' font-weight='bold' font-size='20' text-anchor='middle'%3EPizza Artesanal%3C/text%3E%3C/svg%3E" alt="Comida" class="pin-imagen">
+                    <div class="pin-overlay">
+                        <button class="boton-guardar-pin">Guardar</button>
+                        <a href="ver-pin.html" class="pin-overlay-link-cover" aria-label="Ver detalle"></a>
+                    </div>
+                </div>
+                <div class="pin-info">
+                    <a href="ver-pin.html" class="pin-titulo-link">
+                        <h3 class="pin-titulo-mini">Pizza Artesanal</h3>
+                    </a>
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <footer>
+        <p class="footer-generico">&copy; 2026 LookBook - Proyecto Integrador</p>
+    </footer>
+</body>
+</html>
