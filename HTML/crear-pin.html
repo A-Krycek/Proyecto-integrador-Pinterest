@@ -1,1 +1,137 @@
 
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear</title>
+
+    <link rel="stylesheet" href="../CSS/es.css">
+</head>
+
+<body>
+
+    <header class="linea-principal" id="linea-perfil">
+
+        <a href="index.html" class="contenedor-logo" id="contenedor-lobby">
+            LOOKBOOK
+        </a>
+
+        <nav class="linea-perfil" id="perfil-lobby">
+
+            <a href="index.html">Explorar</a>
+            <a href="crear-pin.html" class="activo">Crear</a>
+            <a href="mensajes.html">Mensajes</a>
+        </nav>
+        <div class="buscador-pines">
+            <form id="formulario-busqueda" action="index.html" method="GET">
+                <div class="contenedor-busqueda">
+                    <input
+                        type="text"
+                        id="busqueda"
+                        name="busqueda"
+                        class="input-busqueda"
+                        placeholder="Buscar ideas"
+                        autocomplete="off">
+                </div>
+            </form>
+        </div>
+        <div
+            class="linea-perfil-foto"
+            id="perfil-navegacion-derecha">
+
+            <a
+                href="perfil.html"
+                class="link-usuario"
+                id="link-perfil-usuario"
+                title="Mi Perfil">
+                <div class="avatar-placeholder">U</div>
+
+            </a>
+            <a
+                href="bienvenida.html"
+                class="boton-enviar-cerrar-sesion"
+                id="btn-cerrar-sesion">
+
+                Cerrar Sesión
+            </a>
+        </div>
+    </header>
+    <main class="contenedor-principal" id="contenedor-subir">
+        <div class="linea-perfil">
+
+            <a href="index.html">
+                Volver al inicio
+            </a>
+        </div>
+        <form id="formulario-subida" action="perfil.html" method="GET">
+            <div
+                class="contenedor-crear"
+                id="contenedor-crear-pin">
+                <section
+                    class="zona-subida-archivo"
+                    id="zona-arrastrar-archivo">
+                    <input
+                        type="file"
+                        id="input-archivo-real"
+                        accept="image/*"
+                        style="display: none;"
+                        required>
+                        
+                    <h2 class="subida-texto-principal" id="txt-estado-subida">Elige un archivo o arrástralo aquí</h2>
+                    <p class="subida-texto-secundario">Recomendamos usar archivos menores a 20 MB</p>
+                    
+                    <button type="button" class="boton-accion-secundario" id="btn-activar-subida">Seleccionar Archivo</button>
+                    
+                    <div id="vista-previa-contenedor">
+                        <img id="img-vista-previa" alt="Vista previa de imagen seleccionada">
+                    </div>
+                </section>
+
+                <section class="formulario-creacion" id="formulario-categorias">
+                  
+                    <input type="text" placeholder="Añade tu título" class="crear-titulo" required id="input-titulo-pin" autocomplete="off">
+                  
+                    <textarea placeholder="Describe de qué trata tu Pin?" class="crear-textarea" required id="textarea-desc-pin"></textarea>
+
+                    <div class="etica-restriccion" id="seccion-etica-subida">
+                        <h3 class="etica-seccion-titulo">Configuración Ética y Accesibilidad</h3>
+
+                        <label for="categoria-select" class="label-formulario">Categoría</label>
+                        <select id="categoria-select" class="crear-select" required>
+                            <option value="" disabled selected>Selecciona una categoría...</option>
+                            <option value="diseno">Diseño Gráfico</option>
+                            <option value="fotografia">Fotografía</option>
+                            <option value="arquitectura">Arquitectura</option>
+                            <option value="ilustracion">Ilustración</option>
+                            <option value="viajes">Viajes</option>
+                            <option value="gastronomia">Gastronomía</option>
+                            <option value="tecnologia">Tecnología</option>
+                            <option value="citas">Frases e Inspiración</option>
+                            <option value="mascotas">Mascotas</option>
+                        </select>
+
+                        <label class="checkbox-contenedor">
+                            <input type="checkbox" class="checkbox-input" id="chk-contenido-sensible">
+                            <span class="checkbox-label">
+                                Marcar como <strong>Contenido Sensible</strong> (aplica un filtro difuminado blur preventivo a otros usuarios).
+                            </span>
+                        </label>
+
+                        
+                    </div>
+
+                    <div class="crear-acciones">
+                        <a href="index.html" class="boton-accion-cancelar">Cancelar</a>
+                        <button type="submit" class="boton-enviar" id="boton-publicar">Publicar</button>
+                    </div>
+
+                </section>
+
+            </div>
+        </form>
+    </main>
+</body>
+
+</html>
