@@ -1,1 +1,82 @@
 
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro</title>
+    <link rel="stylesheet" href="../CSS/es.css">
+
+</head>
+
+<body class="cuerpo-autenticacion">
+    <header class="linea-principal" id="linea-lobby">
+        <a href="bienvenida.html" class="contenedor-logo" id="contenedor-lobby">LOOKBOOK</a>
+        <div class="linea-perfil" id="perfil-lobby">
+            <a href="bienvenida.html">Volver al inicio</a>
+        </div>
+    </header>
+    <main class="cuerpo-autenticacion" id="contenedor-registro">
+        <div class="tarjeta-autenticacion" id="tarjeta-registro">
+            <h1 class="titulo-autenticacion" id="titulo-registro">Crea tu cuenta</h1>
+            <p class="subtitulo-autenticacion" id="subtitulo-registro"></p>
+            <form id="formulario-registro" action="index.html" method="GET">
+                <div class="grupo-formulario">
+                    <label for="nombre-usuario" class="label-formulario">Ingresa tu nombre</label>
+                    <div class="contenedor-formulario">
+                        <input type="text" id="nombre-usuario" placeholder="Coloca tu usuario" class="input-formulario"
+                            required autocomplete="username">
+                    </div>
+                </div>
+
+                <div class="grupo-formulario">
+                    <label for="correo-registro" class="label-formulario">Correo electrónico</label>
+                    <div class="contenedor-formulario">
+                        <input type="email" id="correo-registro" placeholder="Coloca tu correo" class="input-formulario"
+                            required autocomplete="email">
+                    </div>
+                </div>
+
+                <div class="grupo-formulario">
+                    <label for="contrasena-registro" class="label-formulario">Contraseña</label>
+                    <div class="contenedor-formulario">
+                        <input type="password" id="contrasena-registro" placeholder="Mínimo 8 caracteres"
+                            class="input-formulario" required autocomplete="new-password">
+                    </div>
+                </div>
+
+                <div class="grupo-formulario">
+                    <label for="contrasena-confirmar" class="label-formulario">Confirmar contraseña</label>
+                    <div class="contenedor-formulario">
+                        <input type="password" id="contrasena-confirmar" placeholder="Repite tu contraseña"
+                            class="input-formulario" required autocomplete="new-password">
+                    </div>
+                </div>
+
+                <div class="grupo-formulario">
+                    <label class="checkbox-contenedor">
+                        <input type="checkbox" class="checkbox-input" required id="chk-terminos-registro">
+                        <span class="checkbox-label">
+                            Acepto los <strong>Términos de la Comunidad</strong> y la <strong>Política de Privacidad
+                                Ética</strong> de datos de Visualiazion. Entiendo que mi informacion puede ser
+                            <span>vulnerada</span>
+                        </span>
+                    </label>
+                </div>
+                <button type="submit" class="boton-enviar" id="boton-enviar-registro">Registrarse</button>
+            </form>
+            <div class="separador-autenticacion" id="separador-formulario">o continua con</div>
+            <div class="footer-contenedor-autenticacion">
+                ¿Ya tienes una cuenta? <a href="iniciar-sesion.html" class="link-autenticacion"
+                    id="link-iniciar-sesion">Inicia Sesión aquí</a>
+            </div>
+        </div>
+
+    </main>
+    <footer>
+        <p>&copy; 2026 LookBook - Proyecto Integrador</p>
+    </footer>
+</body>
+
+</html>
