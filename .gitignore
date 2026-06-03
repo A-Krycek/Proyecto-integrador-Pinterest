@@ -1,0 +1,32 @@
+# Python virtual environment
+venv/
+backend/venv/
+.venv/
+env/
+.env
+backend/.env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# SQLite local databases
+backend/pinterest.db
+pinterest.db
+*.db
+*.sqlite3
+
+# OS files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# IDE settings
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
