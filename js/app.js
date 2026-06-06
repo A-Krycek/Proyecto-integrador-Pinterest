@@ -97,17 +97,8 @@ async function cargarCategoriasNav() {
 
 // Inicialización de búsquedas y feed
 document.addEventListener("DOMContentLoaded", () => {
-    // Verificar si hay una búsqueda en la URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const queryParam = urlParams.get("busqueda") || "";
-
-    if (queryParam) {
-        const inputBusqueda = document.getElementById("busqueda");
-        if (inputBusqueda) inputBusqueda.value = queryParam;
-        cargarFeed(queryParam);
-    } else {
-        cargarFeed();
-    }
+    // Cargar feed principal aleatorio de inicio
+    cargarFeed();
     cargarCategoriasNav();
 
     // Lógica del Formulario de Búsqueda
