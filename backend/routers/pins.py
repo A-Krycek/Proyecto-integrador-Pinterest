@@ -93,8 +93,8 @@ def get_pins(
         pins = session.exec(statement).all()
         return [sign_pin_url(p) for p in pins]
         
-    # En ausencia de filtros, feed aleatorio
-    statement = statement.order_by(func.random())
+    # En ausencia de filtros, feed ordenado por fecha de creación descendente (los más nuevos primero)
+    statement = statement.order_by(Pin.creationAt.desc())
     pins = session.exec(statement).all()
     return [sign_pin_url(p) for p in pins]
 
