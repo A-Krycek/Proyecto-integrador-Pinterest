@@ -1,11 +1,17 @@
 from typing import Optional
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlmodel import Session, select
+from sqlmodel import Session, select, SQLModel
 from sqlalchemy.sql.expression import func
 from db import get_session
-from models import Pin, Category, User
+from models import Pin, Category, User, Comment, SavedPin
 from schemas.pin import PinCreate, PinUpdate
 import boto3
+
+class CommentCreate(SQLModel):
+    content: str
+    user_id: int
+
 
 import os
 # Cargar variables de entorno desde .env si existe
@@ -147,3 +153,64 @@ def delete_pin(pin_id: int, session: Session = Depends(get_session)):
         raise HTTPException(status_code=404, detail="Publicación no encontrada")
     session.delete(pin)
     session.commit()
+
+# --- Endpoints de Comentarios y Guardado de Pines ---
+
+@router.post("/{pin_id}/comments")
+def add_comment(pin_id: int, comment: CommentCreate, session: Session = Depends(get_session)):
+    pin = session.get(Pin, pin_id)
+    if not pin:
+        raise HTTPException(status_code=404, detail="Publicación no encontrada")
+    user = session.get(User, comment.user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    
+    new_comment = Comment(content=comment.content, pin_id=pin_id, user_id=comment.user_id)
+    session.add(new_comment)
+    session.commit()
+    session.refresh(new_comment)
+    return {"id": new_comment.id, "content": new_comment.content, "username": user.username}
+
+@router.get("/{pin_id}/comments")
+def get_comments(pin_id: int, session: Session = Depends(get_session)):
+    statement = select(Comment, User.username).join(User, Comment.user_id == User.id).where(Comment.pin_id == pin_id)
+    results = session.exec(statement).all()
+    comments_list = []
+    for comment, username in results:
+        comments_list.append({
+            "id": comment.id,
+            "content": comment.content,
+            "creationAt": comment.creationAt,
+            "pin_id": comment.pin_id,
+            "user_id": comment.user_id,
+            "username": username
+        })
+    return comments_list
+
+@router.post("/{pin_id}/save")
+def save_pin(pin_id: int, payload: dict, session: Session = Depends(get_session)):
+    user_id = payload.get("user_id")
+    if not user_id:
+        raise HTTPException(status_code=400, detail="Falta user_id")
+    existing = session.exec(select(SavedPin).where(SavedPin.user_id == user_id, SavedPin.pin_id == pin_id)).first()
+    if existing:
+        return {"status": "already_saved"}
+    new_saved = SavedPin(user_id=user_id, pin_id=pin_id)
+    session.add(new_saved)
+    session.commit()
+    return {"status": "saved"}
+
+@router.delete("/{pin_id}/unsave")
+def unsave_pin(pin_id: int, user_id: int, session: Session = Depends(get_session)):
+    existing = session.exec(select(SavedPin).where(SavedPin.user_id == user_id, SavedPin.pin_id == pin_id)).first()
+    if not existing:
+        raise HTTPException(status_code=404, detail="No guardado")
+    session.delete(existing)
+    session.commit()
+    return {"status": "unsaved"}
+
+@router.get("/{pin_id}/is-saved")
+def is_saved(pin_id: int, user_id: int, session: Session = Depends(get_session)):
+    existing = session.exec(select(SavedPin).where(SavedPin.user_id == user_id, SavedPin.pin_id == pin_id)).first()
+    return {"is_saved": existing is not None}
+
