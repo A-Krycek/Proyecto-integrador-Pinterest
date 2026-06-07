@@ -1,8 +1,8 @@
 var API_URL = "http://127.0.0.1:8000/api";
 var currentPinId = null;
+var creatorId = null;
 
 async function cargarDetallePin() {
-    // Obtener ID del pin desde la URL
     const urlParams = new URLSearchParams(window.location.search);
     const pinId = urlParams.get("id");
     currentPinId = pinId;
@@ -17,6 +17,7 @@ async function cargarDetallePin() {
         const response = await fetch(`${API_URL}/pins/${pinId}`);
         if (!response.ok) throw new Error("No se pudo cargar la publicación");
         const pin = await response.json();
+        creatorId = pin.user_id;
 
         // 1. Mostrar Imagen
         const imgElement = document.querySelector(".pin-detalle-imagen img");
@@ -57,7 +58,9 @@ async function cargarDetallePin() {
             }
         }
 
-        // Cargar comentarios y recomendados
+        // Cargar estadísticas de seguimiento y comentarios
+        await cargarEstadisticasSeguidores(creatorId);
+        await verificarEstadoSeguimiento(creatorId);
         await cargarComentarios(pinId);
         await cargarRecomendados(pin.category_id, pinId);
 
@@ -65,6 +68,54 @@ async function cargarDetallePin() {
         console.error("Error al cargar el detalle del pin:", error);
         alert("Error: No se pudo cargar el detalle de esta idea.");
         window.location.href = "index.html";
+    }
+}
+
+async function cargarEstadisticasSeguidores(userId) {
+    const elCount = document.getElementById("creador-seguidores-count");
+    if (!elCount) return;
+    try {
+        const res = await fetch(`${API_URL}/users/${userId}/follow-stats`);
+        if (res.ok) {
+            const stats = await res.json();
+            elCount.textContent = `${stats.followers_count} seguidores`;
+        }
+    } catch (error) {
+        console.error("Error al obtener estadísticas de follow:", error);
+    }
+}
+
+async function verificarEstadoSeguimiento(targetId) {
+    const btn = document.getElementById("btn-seguir-usuario");
+    if (!btn) return;
+
+    const userString = localStorage.getItem("user");
+    if (!userString) return;
+    const user = JSON.parse(userString);
+
+    if (user.id == targetId) {
+        btn.style.display = "none"; // Ocultar si es su propio pin
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API_URL}/users/${user.id}/follow-status/${targetId}`);
+        if (res.ok) {
+            const data = await res.json();
+            if (data.is_following) {
+                btn.textContent = "Siguiendo";
+                btn.classList.add("siguiendo");
+                btn.style.backgroundColor = "var(--text-primary)";
+                btn.style.color = "var(--bg-primary)";
+            } else {
+                btn.textContent = "Seguir";
+                btn.classList.remove("siguiendo");
+                btn.style.backgroundColor = "var(--bg-tertiary)";
+                btn.style.color = "var(--text-primary)";
+            }
+        }
+    } catch (error) {
+        console.error("Error al verificar seguimiento:", error);
     }
 }
 
@@ -103,7 +154,6 @@ async function cargarRecomendados(categoryId, currentPinId) {
         const response = await fetch(`${API_URL}/pins/?category_id=${categoryId}`);
         if (response.ok) {
             const pines = await response.json();
-            // Filtrar el pin actual
             const filtrados = pines.filter(p => p.id != currentPinId).slice(0, 6);
             
             if (filtrados.length === 0) {
@@ -144,7 +194,6 @@ async function cargarRecomendados(categoryId, currentPinId) {
 document.addEventListener("DOMContentLoaded", () => {
     cargarDetallePin();
 
-    // Rellenar inicial en avatar de comentario
     const userString = localStorage.getItem("user");
     if (userString) {
         const user = JSON.parse(userString);
@@ -152,6 +201,36 @@ document.addEventListener("DOMContentLoaded", () => {
         if (commentAvatar) {
             commentAvatar.textContent = user.username.charAt(0).toUpperCase();
         }
+    }
+
+    // Gestionar botón de Seguir
+    const btnSeguir = document.getElementById("btn-seguir-usuario");
+    if (btnSeguir) {
+        btnSeguir.addEventListener("click", async () => {
+            if (!userString) {
+                alert("Debes iniciar sesión para seguir usuarios.");
+                window.location.href = "iniciar-sesion.html";
+                return;
+            }
+            const user = JSON.parse(userString);
+            if (!creatorId) return;
+
+            const esSiguiendo = btnSeguir.classList.contains("siguiendo");
+            const method = esSiguiendo ? "DELETE" : "POST";
+            const endpoint = esSiguiendo 
+                ? `${API_URL}/users/${user.id}/unfollow/${creatorId}`
+                : `${API_URL}/users/${user.id}/follow/${creatorId}`;
+
+            try {
+                const res = await fetch(endpoint, { method: method });
+                if (res.ok) {
+                    await verificarEstadoSeguimiento(creatorId);
+                    await cargarEstadisticasSeguidores(creatorId);
+                }
+            } catch (error) {
+                console.error("Error al cambiar estado de seguimiento:", error);
+            }
+        });
     }
 
     // Gestionar envío de comentarios
