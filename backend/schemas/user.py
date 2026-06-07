@@ -10,6 +10,8 @@ class UserUpdate(SQLModel):
     username: Optional[str] = None
     email: Optional[str] = None
     password: Optional[str] = None
+    bio: Optional[str] = None
+    profile_pic: Optional[str] = None
 
 class UserLogin(SQLModel):
     email: str
@@ -19,3 +21,5 @@ class UserResponse(SQLModel):
     id: int
     username: str
     email: str
+    bio: Optional[str] = None
+    profile_pic: Optional[str] = None
