@@ -99,8 +99,8 @@ def get_pins(
         pins = session.exec(statement).all()
         return [sign_pin_url(p) for p in pins]
         
-    # En ausencia de filtros, feed aleatorio
-    statement = statement.order_by(func.random())
+    # En ausencia de filtros, feed ordenado por fecha de creación descendente (los más nuevos primero)
+    statement = statement.order_by(Pin.creationAt.desc())
     pins = session.exec(statement).all()
     return [sign_pin_url(p) for p in pins]
 
@@ -122,7 +122,41 @@ def create_pin(pin: PinCreate, session: Session = Depends(get_session)):
     if not session.get(Category, pin.category_id):
         raise HTTPException(status_code=404, detail="La categoría especificada no existe")
         
+    image_url_str = pin.image_url
+    if image_url_str and image_url_str.startswith("data:image/"):
+        import base64
+        import uuid
+        try:
+            header, encoded = image_url_str.split(",", 1)
+            mime_type = header.split(";")[0].split(":")[1]
+            ext = mime_type.split("/")[1]
+            if ext == "jpeg":
+                ext = "jpg"
+            image_data = base64.b64decode(encoded)
+            s3_key = f"pins/uploaded-{pin.slug}-{uuid.uuid4().hex[:8]}.{ext}"
+            
+            try:
+                s3_client.put_object(
+                    Bucket=BUCKET_NAME,
+                    Key=s3_key,
+                    Body=image_data,
+                    ContentType=mime_type,
+                    ACL="public-read"
+                )
+            except Exception as e:
+                s3_client.put_object(
+                    Bucket=BUCKET_NAME,
+                    Key=s3_key,
+                    Body=image_data,
+                    ContentType=mime_type
+                )
+            image_url_str = f"https://{BUCKET_NAME}.s3.amazonaws.com/{s3_key}"
+        except Exception as e:
+            print(f"Error al subir imagen a S3: {e}")
+            raise HTTPException(status_code=400, detail=f"Error al procesar y subir la imagen a AWS S3: {str(e)}")
+
     new_pin = Pin(**pin.model_dump())
+    new_pin.image_url = image_url_str
     session.add(new_pin)
     session.commit()
     session.refresh(new_pin)
