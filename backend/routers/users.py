@@ -55,17 +55,19 @@ def delete_user(user_id: int, session: Session = Depends(get_session)):
 def user_login(data: UserLogin, session: Session = Depends(get_session)):
     return login(data.email, data.password, session)
 
-# --- Endpoints de Seguidores y Pines del Usuario ---
+from routers.pins import sign_pin_url
 
 @router.get("/{user_id}/pins", response_model=list[Pin])
 def get_user_created_pins(user_id: int, session: Session = Depends(get_session)):
     statement = select(Pin).where(Pin.user_id == user_id)
-    return session.exec(statement).all()
+    pins = session.exec(statement).all()
+    return [sign_pin_url(p) for p in pins]
 
 @router.get("/{user_id}/saved", response_model=list[Pin])
 def get_user_saved_pins(user_id: int, session: Session = Depends(get_session)):
     statement = select(Pin).join(SavedPin, SavedPin.pin_id == Pin.id).where(SavedPin.user_id == user_id)
-    return session.exec(statement).all()
+    pins = session.exec(statement).all()
+    return [sign_pin_url(p) for p in pins]
 
 @router.post("/{user_id}/follow/{target_id}")
 def follow_user(user_id: int, target_id: int, session: Session = Depends(get_session)):

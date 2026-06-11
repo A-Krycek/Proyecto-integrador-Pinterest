@@ -38,7 +38,7 @@ async function cargarFeed(query = "", categoryId = null) {
 
             article.innerHTML = `
                 <div class="pin-imagen-contenedor">
-                    <img src="${imgUrl}" alt="${pin.title}" class="pin-imagen" loading="lazy" onload="this.parentElement.classList.add('cargada')" onerror="this.src='data:image/svg+xml;charset=utf-8,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'500\\' height=\\'500\\'%3E%3Crect width=\\'100%25\\' height=\\'100%25\\' fill=\\'%23f1f5f9\\'/%3E%3Ctext x=\\'50%25\\' y=\\'50%25\\' fill=\\'%2310b981\\' font-family=\\'sans-serif\\' font-weight=\\'bold\\' font-size=\\'20\\' text-anchor=\\'middle\\'%3E${pin.title}%3C/text%3E%3C/svg%3E'">
+                    <img src="${imgUrl}" alt="${pin.title}" class="pin-imagen" loading="lazy" onload="this.parentElement.classList.add('cargada')" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;500&quot; height=&quot;500&quot;><rect width=&quot;100%25&quot; height=&quot;100%25&quot; fill=&quot;%23f1f5f9&quot;/></svg>'">
                     <div class="pin-overlay">
                         <button class="boton-guardar-pin" onclick="event.preventDefault(); alert('¡Pin guardado en tu colección!')">Guardar</button>
                         <a href="ver-pin.html?id=${pin.id}" class="pin-overlay-link-cover" aria-label="Ver detalle"></a>

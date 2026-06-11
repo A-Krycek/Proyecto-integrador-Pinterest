@@ -170,7 +170,7 @@ async function cargarRecomendados(categoryId, currentPinId) {
                 
                 article.innerHTML = `
                     <div class="pin-imagen-contenedor">
-                        <img src="${imgUrl}" alt="${pin.title}" class="pin-imagen" loading="lazy" onerror="this.src='data:image/svg+xml;charset=utf-8,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'500\\' height=\\'500\\'%3E%3Crect width=\\'100%25\\' height=\\'100%25\\' fill=\\'%23f1f5f9\\'/%3E%3Ctext x=\\'50%25\\' y=\\'50%25\\' fill=\\'%2310b981\\' font-family=\\'sans-serif\\' font-weight=\\'bold\\' font-size=\\'20\\' text-anchor=\\'middle\\'%3E${pin.title}%3C/text%3E%3C/svg%3E'">
+                        <img src="${imgUrl}" alt="${pin.title}" class="pin-imagen" loading="lazy" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;500&quot; height=&quot;500&quot;><rect width=&quot;100%25&quot; height=&quot;100%25&quot; fill=&quot;%23f1f5f9&quot;/></svg>'">
                         <div class="pin-overlay">
                             <button class="boton-guardar-pin" onclick="event.preventDefault(); alert('Pin guardado')">Guardar</button>
                             <a href="ver-pin.html?id=${pin.id}" class="pin-overlay-link-cover" aria-label="Ver detalle"></a>
@@ -201,6 +201,72 @@ document.addEventListener("DOMContentLoaded", () => {
         if (commentAvatar) {
             commentAvatar.textContent = user.username.charAt(0).toUpperCase();
         }
+    }
+
+    // Gestionar botón de Guardar
+    const btnGuardar = document.querySelector(".tarjeta-pin-detalle .boton-guardar-pin");
+    
+    async function actualizarEstadoGuardado() {
+        if (!userString || !currentPinId) return;
+        const user = JSON.parse(userString);
+        try {
+            const res = await fetch(`${API_URL}/pins/${currentPinId}/is-saved?user_id=${user.id}`);
+            if (res.ok) {
+                const data = await res.json();
+                if (data.is_saved) {
+                    btnGuardar.textContent = "Guardado";
+                    btnGuardar.classList.add("guardado");
+                    btnGuardar.style.backgroundColor = "var(--bg-tertiary)";
+                    btnGuardar.style.color = "var(--text-primary)";
+                } else {
+                    btnGuardar.textContent = "Guardar";
+                    btnGuardar.classList.remove("guardado");
+                    btnGuardar.style.backgroundColor = "var(--accent-color)";
+                    btnGuardar.style.color = "white";
+                }
+            }
+        } catch (error) {
+            console.error("Error al obtener estado de guardado:", error);
+        }
+    }
+
+    if (btnGuardar) {
+        actualizarEstadoGuardado();
+        
+        btnGuardar.addEventListener("click", async () => {
+            if (!userString) {
+                alert("Debes iniciar sesión para guardar pines.");
+                window.location.href = "iniciar-sesion.html";
+                return;
+            }
+            const user = JSON.parse(userString);
+            if (!currentPinId) return;
+
+            const esGuardado = btnGuardar.classList.contains("guardado");
+            const method = esGuardado ? "DELETE" : "POST";
+            const endpoint = esGuardado 
+                ? `${API_URL}/pins/${currentPinId}/unsave?user_id=${user.id}`
+                : `${API_URL}/pins/${currentPinId}/save`;
+            
+            const options = {
+                method: method,
+                headers: { "Content-Type": "application/json" }
+            };
+            if (!esGuardado) {
+                options.body = JSON.stringify({ user_id: user.id });
+            }
+
+            try {
+                const res = await fetch(endpoint, options);
+                if (res.ok) {
+                    await actualizarEstadoGuardado();
+                } else {
+                    alert("Error al guardar el pin.");
+                }
+            } catch (error) {
+                console.error("Error al cambiar estado de guardado:", error);
+            }
+        });
     }
 
     // Gestionar botón de Seguir
