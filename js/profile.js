@@ -14,6 +14,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     const txtBiografia = document.getElementById("biografia-usuario-perfil");
     const avatarPlaceholders = document.querySelectorAll("#cabecera-perfil-usuario .avatar-placeholder");
 
+    // Determinar si estamos viendo el perfil propio o de otro usuario
+    const urlParams = new URLSearchParams(window.location.search);
+    const profileIdStr = urlParams.get("id");
+    let isOwnProfile = true;
+    let targetUserId = user.id;
+
+    if (profileIdStr && profileIdStr !== String(user.id)) {
+        isOwnProfile = false;
+        targetUserId = parseInt(profileIdStr);
+    }
+
+    // Ocultar botón de editar si es el perfil de otro usuario
+    const btnEditar = document.getElementById("btn-editar-perfil");
+    if (!isOwnProfile && btnEditar) {
+        btnEditar.style.display = "none";
+    }
+
     function renderUserData(data) {
         if (txtNombreCompleto) txtNombreCompleto.textContent = data.username;
         if (txtNombreUsuario) txtNombreUsuario.textContent = `@${data.username.toLowerCase().replace(/\s+/g, "")}`;
@@ -34,19 +51,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Cargar estadísticas y datos detallados desde la API
     async function loadFullProfile() {
         try {
-            const response = await fetch(`${API_URL}/users/${user.id}`);
+            const response = await fetch(`${API_URL}/users/${targetUserId}`);
             if (response.ok) {
                 const fullUser = await response.json();
                 renderUserData(fullUser);
                 
-                // Actualizar los inputs del modal
-                document.getElementById("edit-nombre").value = fullUser.username;
-                document.getElementById("edit-bio").value = fullUser.bio || "";
-                document.getElementById("edit-foto").value = fullUser.profile_pic || "";
+                // Actualizar los inputs del modal solo si es perfil propio
+                if (isOwnProfile) {
+                    const editNombre = document.getElementById("edit-nombre");
+                    const editBio = document.getElementById("edit-bio");
+                    const editFoto = document.getElementById("edit-foto");
+                    if (editNombre) editNombre.value = fullUser.username;
+                    if (editBio) editBio.value = fullUser.bio || "";
+                    if (editFoto) editFoto.value = fullUser.profile_pic || "";
+                }
                 
                 // Cargar estadísticas de seguidores/seguidos
                 try {
-                    const statsRes = await fetch(`${API_URL}/users/${user.id}/follow-stats`);
+                    const statsRes = await fetch(`${API_URL}/users/${targetUserId}/follow-stats`);
                     if (statsRes.ok) {
                         const stats = await statsRes.json();
                         const segCountEl = document.getElementById("seguidores-count");
@@ -96,8 +118,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         
         try {
             const endpoint = tipo === "created" 
-                ? `${API_URL}/users/${user.id}/pins` 
-                : `${API_URL}/users/${user.id}/saved`;
+                ? `${API_URL}/users/${targetUserId}/pins` 
+                : `${API_URL}/users/${targetUserId}/saved`;
                 
             const response = await fetch(endpoint);
             if (!response.ok) throw new Error("Error al obtener pines");
@@ -116,12 +138,17 @@ document.addEventListener("DOMContentLoaded", async () => {
                 
                 const imgUrl = pin.image_url || "../assets/placeholder.jpg";
                 
+                // Solo mostrar botón eliminar si es el perfil propio del usuario logueado Y en la pestaña "Creados"
+                const botonEliminarHtml = (isOwnProfile && tipo === "created")
+                    ? `<button class="boton-eliminar-pin" data-pin-id="${pin.id}">Eliminar</button>`
+                    : "";
+                
                 article.innerHTML = `
                     <div class="pin-imagen-contenedor">
                         <img src="${imgUrl}" alt="${pin.title}" class="pin-imagen" loading="lazy" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;500&quot; height=&quot;500&quot;><rect width=&quot;100%25&quot; height=&quot;100%25&quot; fill=&quot;%23f1f5f9&quot;/></svg>'">
                         <div class="pin-overlay">
                             <div class="pin-overlay-header" style="display: flex; justify-content: space-between; width: 100%; align-items: center; z-index: 2;">
-                                <button class="boton-eliminar-pin" data-pin-id="${pin.id}">Eliminar</button>
+                                ${botonEliminarHtml}
                                 <button class="boton-guardar-pin" onclick="event.preventDefault(); alert('Pin guardado')">Guardar</button>
                             </div>
                             <a href="ver-pin.html?id=${pin.id}" class="pin-overlay-link-cover" aria-label="Ver detalle"></a>
@@ -139,7 +166,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                     deleteBtn.addEventListener("click", async () => {
                         if (confirm("¿Estás seguro de que quieres eliminar esta publicación?")) {
                             try {
-                                const response = await fetch(`${API_URL}/pins/${pin.id}`, {
+                                // Agregamos user_id para que el backend nos lo valide correctamente
+                                const response = await fetch(`${API_URL}/pins/${pin.id}?user_id=${user.id}`, {
                                     method: "DELETE"
                                 });
                                 if (response.ok) {
