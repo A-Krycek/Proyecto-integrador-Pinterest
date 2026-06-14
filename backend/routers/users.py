@@ -8,23 +8,7 @@ from schemas.user import UserCreate, UserLogin, UserUpdate, UserResponse
 
 router = APIRouter(prefix="/users", tags=["users"])
 
-@router.get("/", response_model=list[UserResponse])
-def get_users(session: Session = Depends(get_session)):
-    users = session.exec(select(User)).all()
-    response_users = []
-    for user in users:
-        followers_count = session.exec(select(func.count()).select_from(Follow).where(Follow.followed_id == user.id)).one()
-        following_count = session.exec(select(func.count()).select_from(Follow).where(Follow.follower_id == user.id)).one()
-        response_users.append(UserResponse(
-            id=user.id,
-            username=user.username,
-            email=user.email,
-            avatar_url=user.avatar_url,
-            bio=user.bio,
-            followers_count=followers_count,
-            following_count=following_count
-        ))
-    return response_users
+
 
 @router.get("/{user_id}", response_model=UserResponse)
 def get_user(user_id: int, session: Session = Depends(get_session)):
@@ -89,13 +73,7 @@ def update_user(user_id: int, data: UserUpdate, session: Session = Depends(get_s
         following_count=following_count
     )
 
-@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_user(user_id: int, session: Session = Depends(get_session)):
-    user = session.get(User, user_id)
-    if not user:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
-    session.delete(user)
-    session.commit()
+
 
 @router.post("/login", response_model=UserResponse)
 def user_login(data: UserLogin, session: Session = Depends(get_session)):
