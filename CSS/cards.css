@@ -147,3 +147,27 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+.boton-eliminar-pin {
+    background-color: #e11d48;
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 8px 14px;
+    border-radius: var(--radius-full);
+    align-self: flex-start;
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-8px);
+    transition: var(--transition-fast), transform var(--transition-normal);
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+}
+
+.pin-imagen-contenedor:hover .boton-eliminar-pin {
+    transform: translateY(0);
+}
+
+.boton-eliminar-pin:hover {
+    background-color: #be123c;
+}

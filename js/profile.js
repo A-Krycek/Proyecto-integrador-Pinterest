@@ -120,7 +120,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <div class="pin-imagen-contenedor">
                         <img src="${imgUrl}" alt="${pin.title}" class="pin-imagen" loading="lazy" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;500&quot; height=&quot;500&quot;><rect width=&quot;100%25&quot; height=&quot;100%25&quot; fill=&quot;%23f1f5f9&quot;/></svg>'">
                         <div class="pin-overlay">
-                            <button class="boton-guardar-pin" onclick="event.preventDefault(); alert('Pin guardado')">Guardar</button>
+                            <div class="pin-overlay-header" style="display: flex; justify-content: space-between; width: 100%; align-items: center; z-index: 2;">
+                                <button class="boton-eliminar-pin" data-pin-id="${pin.id}">Eliminar</button>
+                                <button class="boton-guardar-pin" onclick="event.preventDefault(); alert('Pin guardado')">Guardar</button>
+                            </div>
                             <a href="ver-pin.html?id=${pin.id}" class="pin-overlay-link-cover" aria-label="Ver detalle"></a>
                         </div>
                     </div>
@@ -130,6 +133,28 @@ document.addEventListener("DOMContentLoaded", async () => {
                         </a>
                     </div>
                 `;
+                
+                const deleteBtn = article.querySelector(".boton-eliminar-pin");
+                if (deleteBtn) {
+                    deleteBtn.addEventListener("click", async () => {
+                        if (confirm("¿Estás seguro de que quieres eliminar esta publicación?")) {
+                            try {
+                                const response = await fetch(`${API_URL}/pins/${pin.id}`, {
+                                    method: "DELETE"
+                                });
+                                if (response.ok) {
+                                    alert("Publicación eliminada");
+                                    article.remove();
+                                } else {
+                                    alert("Error al eliminar (código de respuesta no OK)");
+                                }
+                            } catch (err) {
+                                console.error(err);
+                            }
+                        }
+                    });
+                }
+                
                 mosaico.appendChild(article);
             });
         } catch (error) {
