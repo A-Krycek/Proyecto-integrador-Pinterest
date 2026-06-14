@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crear</title>
-
-    <link rel="stylesheet" href="../CSS/es.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="../js/design.js?v=2"></script>
 </head>
 
 <body>
@@ -72,7 +72,6 @@
                         type="file"
                         id="input-archivo-real"
                         accept="image/*"
-                        style="display: none;"
                         required>
                         
                     <h2 class="subida-texto-principal" id="txt-estado-subida">Elige un archivo o arrástralo aquí</h2>
@@ -91,8 +90,8 @@
                   
                     <textarea placeholder="Describe de qué trata tu Pin?" class="crear-textarea" required id="textarea-desc-pin"></textarea>
                     
-                    <label for="input-tags-pin" class="label-formulario" style="margin-top: 15px; display: block;">Etiquetas</label>
-                    <input type="text" placeholder="Ejemplo: diseno, arte, inspiracion" class="crear-titulo" id="input-tags-pin" style="font-size: 1rem; padding: 12px; margin-top: 5px; border-radius: var(--radius-md); border: 1px solid var(--border-color); width: 100%; background-color: var(--bg-primary); color: var(--text-primary);" autocomplete="off">
+                    <label for="input-tags-pin" class="label-formulario label-tags">Etiquetas</label>
+                    <input type="text" placeholder="Ejemplo: diseno, arte, inspiracion" class="crear-titulo" id="input-tags-pin" autocomplete="off">
 
                     <div class="etica-restriccion" id="seccion-etica-subida">
                         <h3 class="etica-seccion-titulo">Configuración Ética y Accesibilidad</h3>
@@ -118,7 +117,6 @@
                             </span>
                         </label>
 
-                        
                     </div>
 
                     <div class="crear-acciones">
@@ -131,8 +129,10 @@
             </div>
         </form>
     </main>
+
+    <div id="toast-container"></div>
+
     <script src="../js/auth.js?v=2"></script>
     <script src="../js/upload.js?v=2"></script>
 </body>
-
 </html>

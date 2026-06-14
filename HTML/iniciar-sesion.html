@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesión</title>
-    <link rel="stylesheet" href="../CSS/es.css">
-
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="../js/design.js?v=2"></script>
 </head>
 <body class="cuerpo-autenticacion">
 <header class="linea-principal" id="linea-autenticacion">
@@ -23,21 +23,26 @@
         </h1>
 
         <p class="subtitulo-autenticacion" id="subtitulo-login">
-            Inicia sesión para comenzar el viaje <br>
-            <span style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-top: 6px;">(Credenciales de prueba pre-cargadas)</span>
+            Inicia sesión para comenzar el viaje
         </p>
         <form id="formulario-autenticacion" action="index.html" method="GET">
             <div class="grupo-formulario">
                 <label for="correo" class="label-formulario">Correo electrónico</label>
                 <div class="contenedor-formulario">
-                    <input type="email" id="correo" value="usuario@lookbook.com" class="input-formulario" required autocomplete="email">
+                    <input type="email" id="correo" class="input-formulario" placeholder="tu@correo.com" required autocomplete="email">
                 </div>
             </div>
-            <div class="grupo-formulario">
+            <div class="grupo-formulario" style="margin-bottom: 8px;">
                 <label for="contraseña" class="label-formulario">Contraseña</label>
                 <div class="contenedor-formulario">
-                    <input type="password" id="contraseña" value="12345678" class="input-formulario" required autocomplete="current-password">
+                    <input type="password" id="contraseña" class="input-formulario" placeholder="••••••••" required autocomplete="current-password">
                 </div>
+            </div>
+            <div class="grupo-formulario" style="margin-top: -8px; margin-bottom: 18px;">
+                <label class="checkbox-contenedor">
+                    <input type="checkbox" id="chk-mostrar-contraseña" class="checkbox-input">
+                    <span>Mostrar contraseña</span>
+                </label>
             </div>
             <button type="submit" class="boton-enviar" id="boton-enviar-iniciar-sesion">Iniciar Sesión</button>
 
@@ -52,6 +57,9 @@
 <footer>
     <p>&copy; 2026 LookBook - Proyecto Integrador</p>
 </footer>
+
+<div id="toast-container"></div>
+
 <script src="../js/auth.js"></script>
 </body>
 </html>
