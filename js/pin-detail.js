@@ -51,6 +51,11 @@ async function cargarDetallePin() {
                     if (creatorAvatar) {
                         creatorAvatar.textContent = userData.username.charAt(0).toUpperCase();
                     }
+
+                    const creatorLink = document.getElementById("creador-perfil-link");
+                    if (creatorLink) {
+                        creatorLink.href = `perfil.html?id=${userData.id}`;
+                    }
                 }
             } catch (error) {
                 console.error("Error al cargar creador:", error);

@@ -163,7 +163,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 
                 const deleteBtn = article.querySelector(".boton-eliminar-pin");
                 if (deleteBtn) {
-                    deleteBtn.addEventListener("click", async () => {
+                    deleteBtn.addEventListener("click", async (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
                         if (confirm("¿Estás seguro de que quieres eliminar esta publicación?")) {
                             try {
                                 // Agregamos user_id para que el backend nos lo valide correctamente
