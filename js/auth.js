@@ -33,11 +33,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Lógica para Iniciar Sesión
     const formLogin = document.getElementById("formulario-autenticacion");
+    const errorLogin = document.getElementById("error-login");
     if (formLogin) {
         formLogin.addEventListener("submit", async (e) => {
             e.preventDefault();
             const email = document.getElementById("correo").value;
             const password = document.getElementById("contraseña").value;
+            
+            if (errorLogin) {
+                errorLogin.style.display = "none";
+                errorLogin.textContent = "";
+            }
             
             try {
                 const response = await fetch(`${API_URL}/users/login`, {
@@ -50,7 +56,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 if (!response.ok) {
                     const err = await response.json();
-                    alert(err.detail || "Error de inicio de sesión");
+                    const errMsg = err.detail || "Error de inicio de sesión";
+                    if (errorLogin) {
+                        errorLogin.textContent = errMsg;
+                        errorLogin.style.display = "block";
+                    } else {
+                        alert(errMsg);
+                    }
                     return;
                 }
                 
@@ -59,7 +71,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 window.location.href = "index.html";
             } catch (error) {
                 console.error("Error al iniciar sesión:", error);
-                alert("No se pudo conectar con el servidor. Verifica que la API esté corriendo.");
+                const networkErrMsg = "No se pudo conectar con el servidor. Verifica que la API esté corriendo.";
+                if (errorLogin) {
+                    errorLogin.textContent = networkErrMsg;
+                    errorLogin.style.display = "block";
+                } else {
+                    alert(networkErrMsg);
+                }
             }
         });
     }
