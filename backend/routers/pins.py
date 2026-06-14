@@ -181,10 +181,12 @@ def update_pin(pin_id: int, data: PinUpdate, session: Session = Depends(get_sess
     return sign_pin_url(pin)
 
 @router.delete("/{pin_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_pin(pin_id: int, session: Session = Depends(get_session)):
+def delete_pin(pin_id: int, user_id: int, session: Session = Depends(get_session)):
     pin = session.get(Pin, pin_id)
     if not pin:
         raise HTTPException(status_code=404, detail="Publicación no encontrada")
+    if pin.user_id != user_id:
+        raise HTTPException(status_code=403, detail="No tienes permiso para eliminar esta publicación")
     session.delete(pin)
     session.commit()
 
