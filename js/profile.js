@@ -311,12 +311,12 @@ function mostrarConfirmacionEliminar(onConfirm) {
     $(".modal-backdrop").remove();
     const modalHtml = `
         <div class="modal-backdrop" id="modal-confirmacion-eliminar">
-            <div class="modal-contenido">
-                <h3 class="modal-titulo">¿Seguro desea eliminar?</h3>
+            <div class="modal-contenido" style="text-align: center;">
+                <h3 class="modal-titulo" style="text-align: center; margin-top: 0;">¿Seguro desea eliminar?</h3>
                 <p style="color: #8C533E; font-size: 0.95rem; margin-bottom: 24px; line-height: 1.5; text-align: center;">
                     Esta acción es permanente y no se podrá deshacer.
                 </p>
-                <div class="modal-acciones">
+                <div class="modal-acciones" style="justify-content: center; gap: 16px;">
                     <button class="boton-accion-cancelar" id="btn-cancelar-eliminar">Cancelar</button>
                     <button class="boton-enviar" id="btn-confirmar-eliminar" style="background-color: #e11d48;">Eliminar</button>
                 </div>
