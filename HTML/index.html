@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Explorar | LookBook</title>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="../js/design.js?v=2"></script>
+    <link rel="stylesheet" href="../CSS/es.css">
 </head>
 <body>
     <header class="linea-principal" id="linea-perfil">
@@ -38,13 +37,13 @@
     </header>
 
     <main class="contenedor-principal" id="contenedor-explorar">
-        
-        <div class="categorias-nav-container">
-            <nav id="barra-categorias"></nav>
+        <!-- Barra de Categorías Dinámica -->
+        <div class="categorias-nav-container" style="margin-bottom: 30px; padding: 10px 0;">
+            <nav id="barra-categorias" style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;"></nav>
         </div>
         
         <section class="perfil-mosaico" id="mosaico-explorar">
-            
+            <!-- Ejemplo de Pines (Serán reemplazados dinámicamente) -->
             <article class="pin-tarjeta">
                 <div class="pin-imagen-contenedor">
                     <img src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='600'%3E%3Crect width='100%25' height='100%25' fill='%231e1e24'/%3E%3Ctext x='50%25' y='50%25' fill='%238e8e93' font-family='sans-serif' font-weight='bold' font-size='20' text-anchor='middle'%3EDise%C3%B1o Minimalista%3C/text%3E%3C/svg%3E" alt="Pin de ejemplo" class="pin-imagen">
@@ -140,10 +139,7 @@
     <footer>
         <p class="footer-generico">&copy; 2026 LookBook - Proyecto Integrador</p>
     </footer>
-
-    <div id="toast-container"></div>
-
-    <script src="../js/auth.js?v=2"></script>
-    <script src="../js/app.js?v=2"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/app.js"></script>
 </body>
 </html>
