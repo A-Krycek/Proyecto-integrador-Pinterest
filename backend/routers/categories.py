@@ -19,7 +19,7 @@ def get_category(category_id: int, session: Session = Depends(get_session)):
 
 @router.post("/", response_model=Category, status_code=status.HTTP_201_CREATED)
 def create_category(category: CategoryCreate, session: Session = Depends(get_session)):
-    
+    # Validar si el slug o nombre ya existe
     existing = session.exec(select(Category).where(Category.slug == category.slug)).first()
     if existing:
         raise HTTPException(status_code=400, detail="El slug de la categoría ya existe")

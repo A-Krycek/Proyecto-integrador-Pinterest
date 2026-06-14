@@ -1,0 +1,149 @@
+.perfil-mosaico {
+    column-count: 5;
+    column-gap: 16px;
+    width: 100%;
+}
+
+@media (max-width: 1200px) {
+    .perfil-mosaico {
+        column-count: 4;
+    }
+}
+
+@media (max-width: 992px) {
+    .perfil-mosaico {
+        column-count: 3;
+    }
+}
+
+@media (max-width: 768px) {
+    .perfil-mosaico {
+        column-count: 2;
+        column-gap: 12px;
+    }
+}
+
+.pin-tarjeta {
+    break-inside: avoid;
+    margin-bottom: 16px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.pin-imagen-contenedor {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+    background-size: 200% 100%;
+    animation: skeleton-pulse 1.8s infinite linear;
+    cursor: zoom-in;
+    min-height: 240px;
+    transition: background var(--transition-normal);
+}
+
+@keyframes skeleton-pulse {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.pin-imagen-contenedor.cargada {
+    animation: none;
+    background: #f3f4f6;
+}
+
+.pin-imagen {
+    width: 100%;
+    display: block;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out, transform var(--transition-normal);
+}
+
+.pin-imagen-contenedor.cargada .pin-imagen {
+    opacity: 1;
+}
+
+.pin-tarjeta:hover .pin-imagen {
+    transform: scale(1.04);
+}
+
+.pin-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.4));
+    opacity: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 12px;
+    transition: opacity var(--transition-fast);
+    z-index: 10;
+}
+
+.pin-imagen-contenedor:hover .pin-overlay {
+    opacity: 1;
+}
+
+.boton-guardar-pin {
+    background-color: var(--brand-color);
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 700;
+    padding: 8px 14px;
+    border-radius: var(--radius-full);
+    align-self: flex-end;
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-8px);
+    transition: var(--transition-fast), transform var(--transition-normal);
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+}
+
+.pin-imagen-contenedor:hover .boton-guardar-pin {
+    transform: translateY(0);
+}
+
+.boton-guardar-pin:hover {
+    background-color: var(--brand-color-hover);
+}
+
+.pin-overlay-link-cover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.pin-info {
+    padding: 8px 4px;
+}
+
+.pin-titulo-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.pin-titulo-link:hover {
+    text-decoration: underline;
+}
+
+.pin-titulo-mini {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

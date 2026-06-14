@@ -1,0 +1,103 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-primary);
+    line-height: 1.5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-full);
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+    transition: var(--transition-fast);
+}
+
+button {
+    font-family: inherit;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+img {
+    max-width: 100%;
+    display: block;
+    border-radius: var(--radius-lg);
+}
+
+.contenedor-principal {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 100px 24px 40px;
+    flex: 1 0 auto;
+}
+
+footer {
+    background-color: var(--bg-secondary);
+    border-top: 1px solid var(--border-color);
+    padding: 24px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-top: auto;
+}
+
+.footer-generico,
+.footer-bienvenida {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+.footer-generico::before {
+    content: "LOOKBOOK";
+    font-family: var(--font-logo);
+    font-size: 1.6rem;
+    font-weight: normal;
+    color: var(--brand-color);
+    letter-spacing: 1px;
+}
+
+/* Estilos de la barra de categorías dinámica */
+.categoria-item {
+    background-color: var(--bg-secondary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    padding: 8px 18px;
+    border-radius: var(--radius-full);
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: var(--transition-fast);
+}
+
+.categoria-item:hover {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.categoria-item.activo {
+    background-color: var(--brand-color);
+    color: #ffffff;
+    border-color: var(--brand-color);
+}

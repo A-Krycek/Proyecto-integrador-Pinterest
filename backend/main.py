@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from db import create_db
-from migrate_db import migrate
 from routers import users, categories, pins
 
 app = FastAPI(
@@ -13,7 +12,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=False,  
+    allow_credentials=False,  # Cambiado a False para evitar conflictos CORS con el origen comodín "*"
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -21,7 +20,6 @@ app.add_middleware(
 @app.on_event("startup")
 def startup():
     create_db()
-    migrate()
 
 api_prefix = "/api"
 

@@ -1,0 +1,248 @@
+.linea-principal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background-color: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    z-index: 1000;
+}
+
+.contenedor-logo {
+    font-family: var(--font-logo);
+    font-size: 2.1rem;
+    font-weight: normal;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    letter-spacing: 1px;
+}
+
+/* Remove standard ::before icon for a cleaner, fully detailed text logo */
+.contenedor-logo::before {
+    display: none !important;
+}
+
+.contenedor-logo span {
+    display: inline-block;
+    transition: var(--transition-fast);
+}
+
+.contenedor-logo span:hover {
+    transform: scale(1.1) translateY(-2px);
+}
+
+/* Mapeo multicolor para las letras de L-O-O-K-B-O-O-K */
+.contenedor-logo span:nth-child(1) { color: #8C533E; }
+.contenedor-logo span:nth-child(2) { color: #B1BF49; }
+.contenedor-logo span:nth-child(3) { color: #D9A679; }
+.contenedor-logo span:nth-child(4) { color: #9DA658; }
+.contenedor-logo span:nth-child(5) { color: #8C533E; }
+.contenedor-logo span:nth-child(6) { color: #B1BF49; }
+.contenedor-logo span:nth-child(7) { color: #D9A679; }
+.contenedor-logo span:nth-child(8) { color: #9DA658; }
+
+.linea-perfil {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.linea-perfil a {
+    padding: 10px 16px;
+    border-radius: var(--radius-full);
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.linea-perfil a:hover:not(.activo) {
+    background-color: var(--bg-hover);
+}
+
+.linea-perfil a.activo {
+    background-color: var(--text-primary);
+    color: var(--bg-primary);
+}
+
+.buscador-pines {
+    flex-grow: 1;
+    margin: 0 20px;
+    max-width: 680px;
+}
+
+.contenedor-busqueda {
+    position: relative;
+    width: 100%;
+}
+
+.input-busqueda {
+    width: 100%;
+    height: 44px;
+    border-radius: var(--radius-full);
+    background-color: var(--bg-tertiary);
+    border: 2px solid transparent;
+    padding: 0 24px 0 44px;
+    color: var(--text-primary);
+    font-family: inherit;
+    transition: var(--transition-fast);
+}
+
+.contenedor-busqueda::before {
+    content: "🔍";
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.input-busqueda:hover {
+    background-color: var(--bg-hover);
+}
+
+.input-busqueda:focus {
+    background-color: var(--bg-primary);
+    border-color: var(--brand-color);
+    outline: none;
+}
+
+.linea-perfil-foto {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatar-img {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-round);
+    object-fit: cover;
+}
+
+.link-usuario.activo .avatar-img {
+    border: 2px solid var(--text-primary);
+}
+
+.avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-round);
+    background-color: var(--brand-color);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    flex-shrink: 0;
+    transition: var(--transition-fast);
+}
+
+.avatar-placeholder:hover {
+    transform: scale(1.05);
+}
+
+.link-usuario.activo .avatar-placeholder {
+    border: 2px solid var(--text-primary);
+}
+
+.boton-enviar-cerrar-sesion {
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: var(--radius-full);
+}
+
+.boton-enviar-cerrar-sesion:hover {
+    background-color: var(--brand-color);
+    color: #fff;
+    border-color: transparent;
+}
+
+#linea-lobby .buscador-pines,
+#linea-autenticacion .buscador-pines {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .linea-principal {
+        height: 70px;
+        padding: 0 16px;
+    }
+    .buscador-pines {
+        display: none;
+    }
+    .contenedor-logo {
+        font-size: 1.25rem;
+    }
+    .linea-perfil a {
+        padding: 8px 12px;
+        font-size: 0.88rem;
+    }
+    .boton-enviar-cerrar-sesion {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+    }
+    .avatar-placeholder {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .linea-principal {
+        padding: 0 10px;
+    }
+    /* Hide the text "LOOKBOOK", keep only the icon */
+    .contenedor-logo {
+        font-size: 0;
+        gap: 0;
+    }
+    .contenedor-logo::before {
+        width: 32px;
+        height: 32px;
+        font-size: 1.1rem;
+    }
+    .linea-perfil {
+        gap: 4px;
+    }
+    .linea-perfil a {
+        padding: 6px 8px;
+        font-size: 0.8rem;
+    }
+    .linea-perfil-foto {
+        gap: 8px;
+    }
+    .avatar-placeholder {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+    }
+    /* Change "Cerrar Sesión" text to "Salir" on mobile using CSS pseudo-element trick */
+    .boton-enviar-cerrar-sesion {
+        font-size: 0 !important;
+        padding: 6px 10px;
+    }
+    .boton-enviar-cerrar-sesion::after {
+        content: "Salir";
+        font-size: 0.8rem;
+        color: inherit;
+        font-weight: 700;
+        display: inline;
+    }
+}
+
