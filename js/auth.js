@@ -82,6 +82,19 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // Lógica para Mostrar/Ocultar contraseña
+    const chkMostrar = document.getElementById("chk-mostrar-contraseña");
+    const inputContraseña = document.getElementById("contraseña");
+    if (chkMostrar && inputContraseña) {
+        chkMostrar.addEventListener("change", () => {
+            if (chkMostrar.checked) {
+                inputContraseña.type = "text";
+            } else {
+                inputContraseña.type = "password";
+            }
+        });
+    }
+
     // Lógica para Registrarse
     const formRegistro = document.getElementById("formulario-registro");
     if (formRegistro) {
