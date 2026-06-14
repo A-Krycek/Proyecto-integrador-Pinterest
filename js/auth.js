@@ -1,4 +1,4 @@
-const API_URL = "http://127.0.0.1:8000/api";
+let API_URL = "http://127.0.0.1:8000/api";
 
 function showToast(title, message, type = "info") {
     const $container = $("#toast-container");
