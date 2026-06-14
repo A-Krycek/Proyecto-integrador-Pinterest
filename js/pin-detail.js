@@ -1,3 +1,5 @@
+const API_URL = "http://127.0.0.1:8000/api";
+
 function obtenerLlaveGuardados() {
     const userStr = localStorage.getItem("user");
     if (userStr) {
@@ -155,6 +157,12 @@ function cargarComentarios(pinId) {
 
 $(function() {
     cargarDetallePin();
+
+    const loggedInUserStr = localStorage.getItem("user");
+    if (loggedInUserStr) {
+        const loggedInUser = JSON.parse(loggedInUserStr);
+        renderizarAvatar(".formulario-comentario .avatar-placeholder", loggedInUser);
+    }
 
     $(document).on("click", ".pin-detalle-acciones .boton-guardar-pin", function(e) {
         e.preventDefault();

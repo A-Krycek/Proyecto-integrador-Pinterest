@@ -34,7 +34,7 @@ function renderizarAvatar(selector, user) {
     }
 }
 
-function checkSession() {
+async function checkSession() {
     const user = localStorage.getItem("user");
     const currentPage = window.location.pathname.split("/").pop();
     
@@ -53,6 +53,18 @@ function checkSession() {
         const userData = JSON.parse(user);
         // Renderizar el avatar en la barra de navegación superior
         renderizarAvatar("#link-perfil-usuario .avatar-placeholder", userData);
+
+        // Sincronizar datos del usuario en segundo plano (avatar, bio, etc.)
+        try {
+            const response = await fetch(`${API_URL}/users/${userData.id}`);
+            if (response.ok) {
+                const freshUserData = await response.json();
+                localStorage.setItem("user", JSON.stringify(freshUserData));
+                renderizarAvatar("#link-perfil-usuario .avatar-placeholder", freshUserData);
+            }
+        } catch (e) {
+            console.error("Error al sincronizar datos del usuario:", e);
+        }
     }
 }
 
