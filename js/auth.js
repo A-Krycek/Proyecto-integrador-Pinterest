@@ -1,5 +1,18 @@
 let API_URL = "http://127.0.0.1:8000/api";
 
+function obtenerLlaveGuardados() {
+    const userStr = localStorage.getItem("user");
+    if (userStr) {
+        try {
+            const user = JSON.parse(userStr);
+            if (user && user.id) {
+                return `saved_pins_user_${user.id}`;
+            }
+        } catch (e) {}
+    }
+    return "saved_pins";
+}
+
 function showToast(title, message, type = "info") {
     const $container = $("#toast-container");
     if (!$container.length) return;

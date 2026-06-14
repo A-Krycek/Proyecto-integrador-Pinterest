@@ -1,16 +1,4 @@
 
-function obtenerLlaveGuardados() {
-    const userStr = localStorage.getItem("user");
-    if (userStr) {
-        try {
-            const user = JSON.parse(userStr);
-            if (user && user.id) {
-                return `saved_pins_user_${user.id}`;
-            }
-        } catch (e) {}
-    }
-    return "saved_pins";
-}
 
 async function cargarDetallePin() {
     const urlParams = new URLSearchParams(window.location.search);
