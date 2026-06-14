@@ -9,9 +9,3 @@ class PinCreate(SQLModel):
     tags: str
     category_id: int
     user_id: int
-
-class PinUpdate(SQLModel):
-    title: Optional[str] = None
-    description: Optional[str] = None
-    tags: Optional[str] = None
-    category_id: Optional[int] = None
