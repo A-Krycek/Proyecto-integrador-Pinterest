@@ -338,6 +338,14 @@ function mostrarConfirmacionEliminar(onConfirm) {
         });
         onConfirm();
     });
+
+    $("#modal-confirmacion-eliminar").on("click", function(e) {
+        if ($(e.target).hasClass("modal-backdrop")) {
+            $(this).fadeOut(200, function() {
+                $(this).remove();
+            });
+        }
+    });
 }
 
 $(function() {
