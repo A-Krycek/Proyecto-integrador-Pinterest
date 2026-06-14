@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesión</title>
-    <link rel="stylesheet" href="../CSS/es.css">
-
+    <script src="https://code.jquery.com/jquery-4.0.0.min.js"></script>
+    <script src="../js/design.js?v=2"></script>
 </head>
 <body class="cuerpo-autenticacion">
 <header class="linea-principal" id="linea-autenticacion">
@@ -25,7 +25,6 @@
         <p class="subtitulo-autenticacion" id="subtitulo-login">
             Inicia sesión para comenzar el viaje
         </p>
-        <div id="error-login" style="display: none; color: #b91c1c; background-color: #fee2e2; border: 1px solid #fca5a5; padding: 10px; border-radius: var(--radius-md); font-size: 0.88rem; margin-bottom: 15px; text-align: center; font-weight: 600;"></div>
         <form id="formulario-autenticacion" action="index.html" method="GET">
             <div class="grupo-formulario">
                 <label for="correo" class="label-formulario">Correo electrónico</label>
@@ -58,6 +57,9 @@
 <footer>
     <p>&copy; 2026 LookBook - Proyecto Integrador</p>
 </footer>
+
+<div id="toast-container"></div>
+
 <script src="../js/auth.js"></script>
 </body>
 </html>

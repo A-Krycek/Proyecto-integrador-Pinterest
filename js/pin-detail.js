@@ -1,346 +1,406 @@
-var API_URL = "http://127.0.0.1:8000/api";
-var currentPinId = null;
-var creatorId = null;
+function obtenerLlaveGuardados() {
+    const userStr = localStorage.getItem("user");
+    if (userStr) {
+        try {
+            const user = JSON.parse(userStr);
+            if (user && user.id) {
+                return `saved_pins_user_${user.id}`;
+            }
+        } catch (e) {}
+    }
+    return "saved_pins";
+}
 
 async function cargarDetallePin() {
     const urlParams = new URLSearchParams(window.location.search);
     const pinId = urlParams.get("id");
-    currentPinId = pinId;
-    
     if (!pinId) {
-        alert("Publicación no especificada.");
-        window.location.href = "index.html";
+        showToast("Error", "Publicación no especificada.", "error");
+        setTimeout(() => {
+            window.location.href = "index.html";
+        }, 1500);
         return;
     }
-
     try {
         const response = await fetch(`${API_URL}/pins/${pinId}`);
         if (!response.ok) throw new Error("No se pudo cargar la publicación");
         const pin = await response.json();
-        creatorId = pin.user_id;
-
-        // 1. Mostrar Imagen
-        const imgElement = document.querySelector(".pin-detalle-imagen img");
-        if (imgElement) {
-            imgElement.src = pin.image_url || "../assets/placeholder.jpg";
-            imgElement.alt = pin.title;
+        const $imgElement = $(".pin-detalle-imagen img");
+        if ($imgElement.length) {
+            $imgElement.attr("src", pin.image_url || "../assets/placeholder.jpg");
+            $imgElement.attr("alt", pin.title);
+            $imgElement.hide().fadeIn(600);
         }
-
-        // 2. Mostrar Título
-        const titleElement = document.querySelector(".pin-detalle-titulo");
-        if (titleElement) {
-            titleElement.textContent = pin.title;
+        $(".pin-detalle-titulo").text(pin.title);
+        $(".pin-detalle-descripcion").text(pin.description);
+        let tagsHtml = "";
+        if (pin.tags) {
+            const tagsList = pin.tags.split(",").map(t => t.trim()).filter(Boolean);
+            tagsHtml = '<div class="pin-detalle-tags">';
+            tagsList.forEach(tag => {
+                tagsHtml += `<span class="pin-tag">#${tag}</span>`;
+            });
+            tagsHtml += '</div>';
         }
-
-        // 3. Mostrar Descripción
-        const descElement = document.querySelector(".pin-detalle-descripcion");
-        if (descElement) {
-            descElement.textContent = pin.description;
-        }
-
-        // 4. Cargar información de creador
-        const creatorNameElement = document.getElementById("creador-nombre-txt");
-        if (creatorNameElement) {
+        $(".pin-detalle-tags").remove();
+        $(".pin-detalle-descripcion").after(tagsHtml);
+        const $creatorName = $(".creador-nombre");
+        if ($creatorName.length) {
             try {
                 const userResponse = await fetch(`${API_URL}/users/${pin.user_id}`);
                 if (userResponse.ok) {
                     const userData = await userResponse.json();
-                    creatorNameElement.textContent = userData.username;
                     
-                    const creatorAvatar = document.querySelector(".pin-detalle-creador .avatar-placeholder");
-                    if (creatorAvatar) {
-                        creatorAvatar.textContent = userData.username.charAt(0).toUpperCase();
+                    // Hacer que el nombre y el avatar sean enlaces al perfil
+                    $creatorName.html(`<a href="perfil.html?id=${userData.id}">${userData.username}</a>`);
+                    
+                    const $creatorAvatar = $(".pin-detalle-creador .avatar-placeholder");
+                    if ($creatorAvatar.length) {
+                        renderizarAvatar(".pin-detalle-creador .avatar-placeholder", userData);
+                        // Envolver avatar en enlace
+                        $creatorAvatar.wrap(`<a href="perfil.html?id=${userData.id}"></a>`);
                     }
 
-                    const creatorLink = document.getElementById("creador-perfil-link");
-                    if (creatorLink) {
-                        creatorLink.href = `perfil.html?id=${userData.id}`;
+                    // Renderizar número de seguidores dinámico
+                    $(".creador-seguidores").text(`${userData.followers_count} seguidores`);
+
+                    // Comprobar estado de seguimiento si hay un usuario logueado
+                    const loggedInUserStr = localStorage.getItem("user");
+                    if (loggedInUserStr) {
+                        const loggedInUser = JSON.parse(loggedInUserStr);
+                        if (loggedInUser.id === userData.id) {
+                            // Si es el propio usuario logueado, ocultar botón seguir
+                            $(".boton-seguir").hide();
+                        } else {
+                            $(".boton-seguir").show();
+                            const followRes = await fetch(`${API_URL}/users/${userData.id}/is-following?follower_id=${loggedInUser.id}`);
+                            if (followRes.ok) {
+                                const followData = await followRes.json();
+                                const $btn = $(".boton-seguir");
+                                if (followData.following) {
+                                    $btn.addClass("siguiendo").text("Siguiendo").css("background-color", "var(--bg-tertiary)");
+                                } else {
+                                    $btn.removeClass("siguiendo").text("Seguir").css("background-color", "var(--brand-color)");
+                                }
+                            }
+                        }
+                    } else {
+                        // Si no hay sesión, ocultar botón seguir
+                        $(".boton-seguir").hide();
                     }
                 }
             } catch (error) {
                 console.error("Error al cargar creador:", error);
-                creatorNameElement.textContent = "Usuario de LookBook";
+                $creatorName.text("Usuario de LookBook");
+            }
+        }
+        let saved = [];
+        try {
+            saved = JSON.parse(localStorage.getItem(obtenerLlaveGuardados())) || [];
+        } catch (err) {
+            saved = [];
+        }
+        const isSaved = saved.includes(parseInt(pinId, 10));
+        const $btn = $(".pin-detalle-acciones .boton-guardar-pin");
+        if (isSaved) {
+            $btn.text("Guardado").addClass("guardado");
+        } else {
+            $btn.text("Guardar").removeClass("guardado");
+        }
+        cargarComentarios(pinId);
+        cargarRecomendaciones(pin.category_id, pin.user_id, pin.id, pin.tags, pin.image_url);
+        applyStyles();
+    } catch (error) {
+        console.error("Error al cargar el detalle del pin:", error);
+        showToast("Error", "No se pudo cargar el detalle de esta idea.", "error");
+        setTimeout(() => {
+            window.location.href = "index.html";
+        }, 2000);
+    }
+}
+
+function cargarComentarios(pinId) {
+    const $lista = $(".lista-comentarios");
+    if (!$lista.length) return;
+    $lista.empty();
+    let comments = [];
+    const stored = localStorage.getItem(`comments_pin_${pinId}`);
+    if (stored === null) {
+        if (pinId == "1" || pinId === 1) {
+            comments = [
+                { author: "Ana Gómez", text: "Me encanta el balance de colores y la simetría. Muy limpio." },
+                { author: "Carlos Ramos", text: "Excelente trabajo con la proporción. Inspirador." }
+            ];
+            localStorage.setItem(`comments_pin_${pinId}`, JSON.stringify(comments));
+        } else {
+            comments = [];
+        }
+    } else {
+        try {
+            comments = JSON.parse(stored) || [];
+        } catch (e) {
+            comments = [];
+        }
+    }
+    comments.forEach(c => {
+        const $item = $("<div>").addClass("comentario-item").html(`
+            <span class="comentario-autor">${c.author}:</span>
+            <span>${c.text}</span>
+        `);
+        $lista.append($item);
+    });
+    $(".pin-detalle-comentarios h3").text(`Comentarios (${comments.length})`);
+    applyStyles();
+}
+
+$(function() {
+    cargarDetallePin();
+
+    $(document).on("click", ".pin-detalle-acciones .boton-guardar-pin", function(e) {
+        e.preventDefault();
+        const urlParams = new URLSearchParams(window.location.search);
+        const pinIdStr = urlParams.get("id");
+        if (!pinIdStr) return;
+        const pinId = parseInt(pinIdStr, 10);
+        let saved = [];
+        try {
+            saved = JSON.parse(localStorage.getItem(obtenerLlaveGuardados())) || [];
+        } catch (err) {
+            saved = [];
+        }
+        const $btn = $(this);
+        if (!saved.includes(pinId)) {
+            saved.push(pinId);
+            localStorage.setItem(obtenerLlaveGuardados(), JSON.stringify(saved));
+            $btn.text("Guardado").addClass("guardado");
+            applyStyles();
+            showToast("LookBook Guardado", "¡Esta idea se guardó en tu colección!", "success");
+        } else {
+            saved = saved.filter(id => id !== pinId);
+            localStorage.setItem(obtenerLlaveGuardados(), JSON.stringify(saved));
+            $btn.text("Guardar").removeClass("guardado");
+            applyStyles();
+            showToast("LookBook Colección", "Esta idea se eliminó de tu colección.", "info");
+        }
+    });
+
+    $(".boton-seguir").on("click", async function() {
+        const userStr = localStorage.getItem("user");
+        if (!userStr) {
+            showToast("Acceso Restringido", "Debes iniciar sesión para seguir creadores.", "warning");
+            return;
+        }
+        const loggedInUser = JSON.parse(userStr);
+        
+        // Obtener el ID del creador desde la URL del perfil en el enlace del nombre
+        const $link = $(".creador-nombre a");
+        if (!$link.length) return;
+        const href = $link.attr("href");
+        const match = href.match(/id=(\d+)/);
+        if (!match) return;
+        const creatorId = parseInt(match[1], 10);
+
+        try {
+            const res = await fetch(`${API_URL}/users/${creatorId}/follow?follower_id=${loggedInUser.id}`, {
+                method: "POST"
+            });
+            if (!res.ok) throw new Error("Error en la petición de follow");
+            const data = await res.json();
+
+            const $btn = $(this);
+            if (data.following) {
+                $btn.addClass("siguiendo").text("Siguiendo").css("background-color", "var(--bg-tertiary)");
+                showToast("Creador", "¡Ahora sigues a este creador!", "success");
+            } else {
+                $btn.removeClass("siguiendo").text("Seguir").css("background-color", "var(--brand-color)");
+                showToast("Creador", "Dejaste de seguir a este creador.", "info");
+            }
+
+            $(".creador-seguidores").text(`${data.followers_count} seguidores`);
+        } catch (error) {
+            console.error("Error al seguir/dejar de seguir:", error);
+            showToast("Error", "No se pudo actualizar el seguimiento.", "error");
+        }
+    });
+
+    const $formComentario = $(".formulario-comentario");
+    if ($formComentario.length) {
+        $formComentario.on("submit", function(e) {
+            e.preventDefault();
+            const $input = $(this).find(".input-comentario");
+            const commentText = $input.val().trim();
+            if (!commentText) return;
+            const urlParams = new URLSearchParams(window.location.search);
+            const pinId = urlParams.get("id");
+            if (!pinId) return;
+            const user = localStorage.getItem("user");
+            let username = "Tú";
+            if (user) {
+                username = JSON.parse(user).username;
+            }
+            let comments = [];
+            const stored = localStorage.getItem(`comments_pin_${pinId}`);
+            if (stored) {
+                try {
+                    comments = JSON.parse(stored) || [];
+                } catch (err) {
+                    comments = [];
+                }
+            }
+            comments.push({ author: username, text: commentText });
+            localStorage.setItem(`comments_pin_${pinId}`, JSON.stringify(comments));
+            $input.val("");
+            cargarComentarios(pinId);
+            showToast("Comentario", "Tu comentario ético fue publicado.", "success");
+        });
+    }
+    $(document).on("click", ".pin-tag", function() {
+        const tagText = $(this).text().replace("#", "");
+        window.location.href = `index.html?busqueda=${encodeURIComponent(tagText)}`;
+    });
+});
+
+async function cargarRecomendaciones(categoryId, artistId, currentPinId, tagsString, currentImageUrl) {
+    const $mosaico = $(".mosaico-recomendado");
+    if (!$mosaico.length) return;
+    
+    $mosaico.html("<p style='grid-column: 1/-1; text-align: center; color: #8C533E; font-weight: 600;'>Cargando recomendaciones...</p>");
+    applyStyles();
+
+    try {
+        let tags = [];
+        if (tagsString) {
+            tags = tagsString.split(',').map(t => t.trim().toLowerCase()).filter(t => t.length > 0);
+        }
+
+        const fetchPromises = [];
+
+        // 1. Cargar por categoría
+        fetchPromises.push(fetch(`${API_URL}/pins/?category_id=${categoryId}`).then(r => r.ok ? r.json() : []));
+
+        // 2. Cargar por creador
+        fetchPromises.push(fetch(`${API_URL}/pins/?user_id=${artistId}`).then(r => r.ok ? r.json() : []));
+
+        // 3. Cargar por tags/búsquedas de coincidencia (máximo las primeras 3 tags para evitar exceso de peticiones)
+        const selectedTags = tags.slice(0, 3);
+        selectedTags.forEach(tag => {
+            fetchPromises.push(fetch(`${API_URL}/pins/?q=${encodeURIComponent(tag)}`).then(r => r.ok ? r.json() : []));
+        });
+
+        const results = await Promise.all(fetchPromises);
+
+        const categoryPines = results[0];
+        const artistPines = results[1];
+        const tagPinesArrays = results.slice(2);
+
+        let tagPines = [];
+        tagPinesArrays.forEach(arr => {
+            tagPines = tagPines.concat(arr);
+        });
+
+        // Orden de prioridad:
+        // 1. Pines que coinciden por tags/búsqueda (relación directa por términos como gengar, pokemon)
+        // 2. Pines del mismo artista (relación de autor)
+        // 3. Pines de la misma categoría (relación de temática general)
+        let combinedPines = [...tagPines, ...artistPines, ...categoryPines];
+
+        // Filtrar el pin actual por ID e imagen para evitar duplicar el pin actual
+        combinedPines = combinedPines.filter(p => parseInt(p.id, 10) !== parseInt(currentPinId, 10) && p.image_url !== currentImageUrl);
+
+        // Eliminar duplicados
+        const uniquePines = [];
+        const seenIds = new Set();
+        for (const pin of combinedPines) {
+            if (!seenIds.has(pin.id)) {
+                seenIds.add(pin.id);
+                uniquePines.push(pin);
             }
         }
 
-        // Cargar estadísticas de seguimiento y comentarios
-        await cargarEstadisticasSeguidores(creatorId);
-        await verificarEstadoSeguimiento(creatorId);
-        await cargarComentarios(pinId);
-        await cargarRecomendados(pin.category_id, pinId);
-
+        renderizarRecomendaciones(uniquePines);
     } catch (error) {
-        console.error("Error al cargar el detalle del pin:", error);
-        alert("Error: No se pudo cargar el detalle de esta idea.");
-        window.location.href = "index.html";
+        console.error("Error al cargar recomendaciones:", error);
+        $mosaico.html("<p style='grid-column: 1/-1; text-align: center; color: #ef4444;'>No se pudieron cargar las recomendaciones.</p>");
     }
 }
 
-async function cargarEstadisticasSeguidores(userId) {
-    const elCount = document.getElementById("creador-seguidores-count");
-    if (!elCount) return;
-    try {
-        const res = await fetch(`${API_URL}/users/${userId}/follow-stats`);
-        if (res.ok) {
-            const stats = await res.json();
-            elCount.textContent = `${stats.followers_count} seguidores`;
-        }
-    } catch (error) {
-        console.error("Error al obtener estadísticas de follow:", error);
-    }
-}
+function renderizarRecomendaciones(pines) {
+    const $mosaico = $(".mosaico-recomendado");
+    $mosaico.empty();
 
-async function verificarEstadoSeguimiento(targetId) {
-    const btn = document.getElementById("btn-seguir-usuario");
-    if (!btn) return;
-
-    const userString = localStorage.getItem("user");
-    if (!userString) return;
-    const user = JSON.parse(userString);
-
-    if (user.id == targetId) {
-        btn.style.display = "none"; // Ocultar si es su propio pin
+    if (pines.length === 0) {
+        $mosaico.html("<p style='grid-column: 1/-1; text-align: center; color: #8C533E;'>No hay ideas similares disponibles.</p>");
+        applyStyles();
         return;
     }
 
-    try {
-        const res = await fetch(`${API_URL}/users/${user.id}/follow-status/${targetId}`);
-        if (res.ok) {
-            const data = await res.json();
-            if (data.is_following) {
-                btn.textContent = "Siguiendo";
-                btn.classList.add("siguiendo");
-                btn.style.backgroundColor = "var(--text-primary)";
-                btn.style.color = "var(--bg-primary)";
-            } else {
-                btn.textContent = "Seguir";
-                btn.classList.remove("siguiendo");
-                btn.style.backgroundColor = "var(--bg-tertiary)";
-                btn.style.color = "var(--text-primary)";
-            }
-        }
-    } catch (error) {
-        console.error("Error al verificar seguimiento:", error);
-    }
-}
-
-async function cargarComentarios(pinId) {
-    const contenedor = document.getElementById("contenedor-comentarios");
-    const titulo = document.getElementById("comentarios-titulo");
-    if (!contenedor) return;
-
-    try {
-        const response = await fetch(`${API_URL}/pins/${pinId}/comments`);
-        if (response.ok) {
-            const comentarios = await response.json();
-            if (titulo) titulo.textContent = `Comentarios (${comentarios.length})`;
-            
-            contenedor.innerHTML = "";
-            comentarios.forEach(com => {
-                const div = document.createElement("div");
-                div.className = "comentario-item";
-                div.innerHTML = `
-                    <span class="comentario-autor" style="font-weight:700;">${com.username || 'Usuario'}:</span>
-                    <span>${com.content}</span>
-                `;
-                contenedor.appendChild(div);
-            });
-        }
-    } catch (error) {
-        console.error("Error al cargar comentarios:", error);
-    }
-}
-
-async function cargarRecomendados(categoryId, currentPinId) {
-    const mosaico = document.getElementById("mosaico-recomendado");
-    if (!mosaico) return;
-
-    try {
-        const response = await fetch(`${API_URL}/pins/?category_id=${categoryId}`);
-        if (response.ok) {
-            const pines = await response.json();
-            const filtrados = pines.filter(p => p.id != currentPinId).slice(0, 6);
-            
-            if (filtrados.length === 0) {
-                mosaico.innerHTML = "<p style='grid-column: 1/-1; text-align: center; color: var(--text-secondary);'>No hay más ideas en esta categoría.</p>";
-                return;
-            }
-
-            mosaico.innerHTML = "";
-            filtrados.forEach(pin => {
-                const article = document.createElement("article");
-                article.className = "pin-tarjeta";
-                
-                const imgUrl = pin.image_url || "../assets/placeholder.jpg";
-                
-                article.innerHTML = `
-                    <div class="pin-imagen-contenedor">
-                        <img src="${imgUrl}" alt="${pin.title}" class="pin-imagen" loading="lazy" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;500&quot; height=&quot;500&quot;><rect width=&quot;100%25&quot; height=&quot;100%25&quot; fill=&quot;%23f1f5f9&quot;/></svg>'">
-                        <div class="pin-overlay">
-                            <button class="boton-guardar-pin" onclick="event.preventDefault(); alert('Pin guardado')">Guardar</button>
-                            <a href="ver-pin.html?id=${pin.id}" class="pin-overlay-link-cover" aria-label="Ver detalle"></a>
-                        </div>
-                    </div>
-                    <div class="pin-info">
-                        <a href="ver-pin.html?id=${pin.id}" class="pin-titulo-link">
-                            <h3 class="pin-titulo-mini">${pin.title}</h3>
-                        </a>
-                    </div>
-                `;
-                mosaico.appendChild(article);
-            });
-        }
-    } catch (error) {
-        console.error("Error al cargar recomendados:", error);
-    }
-}
-
-// Inicialización
-document.addEventListener("DOMContentLoaded", () => {
-    cargarDetallePin();
-
-    const userString = localStorage.getItem("user");
-    if (userString) {
-        const user = JSON.parse(userString);
-        const commentAvatar = document.getElementById("comentario-avatar-usuario");
-        if (commentAvatar) {
-            commentAvatar.textContent = user.username.charAt(0).toUpperCase();
-        }
-    }
-
-    // Gestionar botón de Guardar
-    const btnGuardar = document.querySelector(".tarjeta-pin-detalle .boton-guardar-pin");
-    
-    async function actualizarEstadoGuardado() {
-        if (!userString || !currentPinId) return;
-        const user = JSON.parse(userString);
-        try {
-            const res = await fetch(`${API_URL}/pins/${currentPinId}/is-saved?user_id=${user.id}`);
-            if (res.ok) {
-                const data = await res.json();
-                if (data.is_saved) {
-                    btnGuardar.textContent = "Guardado";
-                    btnGuardar.classList.add("guardado");
-                    btnGuardar.style.backgroundColor = "var(--bg-tertiary)";
-                    btnGuardar.style.color = "var(--text-primary)";
-                } else {
-                    btnGuardar.textContent = "Guardar";
-                    btnGuardar.classList.remove("guardado");
-                    btnGuardar.style.backgroundColor = "var(--accent-color)";
-                    btnGuardar.style.color = "white";
-                }
-            }
-        } catch (error) {
-            console.error("Error al obtener estado de guardado:", error);
-        }
-    }
-
-    if (btnGuardar) {
-        actualizarEstadoGuardado();
+    pines.forEach(pin => {
+        const $article = $("<article>").addClass("pin-tarjeta");
+        const imgUrl = pin.image_url || "../assets/placeholder.jpg";
         
-        btnGuardar.addEventListener("click", async () => {
-            if (!userString) {
-                alert("Debes iniciar sesión para guardar pines.");
-                window.location.href = "iniciar-sesion.html";
-                return;
-            }
-            const user = JSON.parse(userString);
-            if (!currentPinId) return;
+        let saved = [];
+        try {
+            saved = JSON.parse(localStorage.getItem(obtenerLlaveGuardados())) || [];
+        } catch (err) {
+            saved = [];
+        }
+        const isSaved = saved.includes(pin.id);
+        const btnText = isSaved ? "Guardado" : "Guardar";
+        const btnClass = isSaved ? "boton-guardar-pin guardado" : "boton-guardar-pin";
 
-            const esGuardado = btnGuardar.classList.contains("guardado");
-            const method = esGuardado ? "DELETE" : "POST";
-            const endpoint = esGuardado 
-                ? `${API_URL}/pins/${currentPinId}/unsave?user_id=${user.id}`
-                : `${API_URL}/pins/${currentPinId}/save`;
-            
-            const options = {
-                method: method,
-                headers: { "Content-Type": "application/json" }
-            };
-            if (!esGuardado) {
-                options.body = JSON.stringify({ user_id: user.id });
-            }
+        $article.html(`
+            <div class="pin-imagen-contenedor">
+                <img src="${imgUrl}" alt="${pin.title}" class="pin-imagen" style="opacity: 0; transition: opacity 0.5s ease-in-out;">
+                <div class="pin-overlay">
+                    <button class="${btnClass}">${btnText}</button>
+                    <a href="ver-pin.html?id=${pin.id}" class="pin-overlay-link-cover" aria-label="Ver detalle"></a>
+                </div>
+            </div>
+            <div class="pin-info">
+                <a href="ver-pin.html?id=${pin.id}" class="pin-titulo-link">
+                    <h3 class="pin-titulo-mini">${pin.title}</h3>
+                </a>
+            </div>
+        `);
 
-            try {
-                const res = await fetch(endpoint, options);
-                if (res.ok) {
-                    await actualizarEstadoGuardado();
-                } else {
-                    alert("Error al guardar el pin.");
-                }
-            } catch (error) {
-                console.error("Error al cambiar estado de guardado:", error);
-            }
-        });
-    }
-
-    // Gestionar botón de Seguir
-    const btnSeguir = document.getElementById("btn-seguir-usuario");
-    if (btnSeguir) {
-        btnSeguir.addEventListener("click", async () => {
-            if (!userString) {
-                alert("Debes iniciar sesión para seguir usuarios.");
-                window.location.href = "iniciar-sesion.html";
-                return;
-            }
-            const user = JSON.parse(userString);
-            if (!creatorId) return;
-
-            const esSiguiendo = btnSeguir.classList.contains("siguiendo");
-            const method = esSiguiendo ? "DELETE" : "POST";
-            const endpoint = esSiguiendo 
-                ? `${API_URL}/users/${user.id}/unfollow/${creatorId}`
-                : `${API_URL}/users/${user.id}/follow/${creatorId}`;
-
-            try {
-                const res = await fetch(endpoint, { method: method });
-                if (res.ok) {
-                    await verificarEstadoSeguimiento(creatorId);
-                    await cargarEstadisticasSeguidores(creatorId);
-                }
-            } catch (error) {
-                console.error("Error al cambiar estado de seguimiento:", error);
-            }
-        });
-    }
-
-    // Gestionar envío de comentarios
-    const formComentario = document.getElementById("form-comentario");
-    if (formComentario) {
-        formComentario.addEventListener("submit", async (e) => {
+        $article.find(".boton-guardar-pin").on("click", function(e) {
             e.preventDefault();
-            if (!userString) {
-                alert("Debes iniciar sesión para comentar.");
-                window.location.href = "iniciar-sesion.html";
-                return;
-            }
-            const user = JSON.parse(userString);
-            const input = document.getElementById("input-nuevo-comentario");
-            const content = input.value.trim();
-            if (!content || !currentPinId) return;
-
+            e.stopPropagation();
+            let saved = [];
             try {
-                const response = await fetch(`${API_URL}/pins/${currentPinId}/comments`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        content: content,
-                        user_id: user.id
-                    })
-                });
-
-                if (response.ok) {
-                    input.value = "";
-                    await cargarComentarios(currentPinId);
-                } else {
-                    const err = await response.json();
-                    alert(err.detail || "Error al comentar.");
-                }
-            } catch (error) {
-                console.error("Error al publicar comentario:", error);
+                saved = JSON.parse(localStorage.getItem(obtenerLlaveGuardados())) || [];
+            } catch (err) {
+                saved = [];
+            }
+            const $btn = $(this);
+            if (!saved.includes(pin.id)) {
+                saved.push(pin.id);
+                localStorage.setItem(obtenerLlaveGuardados(), JSON.stringify(saved));
+                $btn.text("Guardado").addClass("guardado");
+                applyStyles();
+                showToast("LookBook Guardado", `¡"${pin.title}" se guardó en tu colección!`, "success");
+            } else {
+                saved = saved.filter(id => id !== pin.id);
+                localStorage.setItem(obtenerLlaveGuardados(), JSON.stringify(saved));
+                $btn.text("Guardar").removeClass("guardado");
+                applyStyles();
+                showToast("LookBook Colección", `"${pin.title}" se eliminó de tu colección.`, "info");
             }
         });
-    }
-});
+
+        const $img = $article.find(".pin-imagen");
+        $img.on("load", function() {
+            $(this).parent().addClass("cargada");
+            $(this).css('opacity', '1');
+            applyStyles();
+        });
+
+        if ($img[0] && $img[0].complete) {
+            $img.parent().addClass("cargada");
+            $img.css('opacity', '1');
+        }
+
+        $mosaico.append($article);
+    });
+    applyStyles();
+}

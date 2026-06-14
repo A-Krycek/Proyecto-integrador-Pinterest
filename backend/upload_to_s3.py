@@ -8,7 +8,6 @@ import boto3
 from botocore.exceptions import ClientError
 from sqlmodel import SQLModel, Session, select
 
-# Reconfigurar la salida estándar para evitar UnicodeEncodeError en Windows
 if sys.platform.startswith("win"):
     sys.stdout.reconfigure(encoding='utf-8')
     sys.stderr.reconfigure(encoding='utf-8')
@@ -22,29 +21,20 @@ def make_long_path_safe(path):
         return "\\\\?\\" + abspath
     return abspath
 
-# Asegurar que el directorio actual esté en el PATH para las importaciones locales
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from db import engine, create_db
 from models import User, Category, Pin
 
-# Cargar variables de entorno desde .env si existe
-env_path = os.path.join(os.path.dirname(__file__), ".env")
-if os.path.exists(env_path):
-    with open(env_path) as f:
-        for line in f:
-            line = line.strip()
-            if line and not line.startswith("#") and "=" in line:
-                key, val = line.split("=", 1)
-                os.environ[key.strip()] = val.strip()
 
-# Credenciales de AWS
+from dotenv import load_dotenv
+load_dotenv()
+
 ACCESS_KEY = os.getenv("AWS_ACCESS_KEY_ID", "YOUR_ACCESS_KEY")
 SECRET_KEY = os.getenv("AWS_SECRET_ACCESS_KEY", "YOUR_SECRET_KEY")
-BUCKET_NAME = os.getenv("AWS_BUCKET_NAME", "lookbook-data-storage-dfpaz")
+BUCKET_NAME = "lookbook-data-storage-dfpaz"
 SOURCE_DIR = "C:\\Users\\dfpaz\\OneDrive\\Documentos\\Imagenes_S3"
 
-# Categorías predefinidas
 CATEGORIES_LIST = [
     {"name": "Caballeros y Armaduras", "slug": "caballeros-y-armaduras", "image": f"https://{BUCKET_NAME}.s3.amazonaws.com/categories/knights.jpg"},
     {"name": "Autos y Carreras", "slug": "autos-y-carreras", "image": f"https://{BUCKET_NAME}.s3.amazonaws.com/categories/cars.jpg"},
@@ -54,7 +44,6 @@ CATEGORIES_LIST = [
     {"name": "Diseño y Arte", "slug": "diseno-y-arte", "image": f"https://{BUCKET_NAME}.s3.amazonaws.com/categories/art.jpg"},
 ]
 
-# Usuarios realistas con temáticas asociadas
 USERS_LIST = [
     {"username": "Danixdy", "email": "danixdy@lookbook.com", "password": "password123", "theme": "Caballeros y Armaduras"},
     {"username": "IronKnight", "email": "ironknight@lookbook.com", "password": "password123", "theme": "Caballeros y Armaduras"},
@@ -98,20 +87,18 @@ def parse_folder_name(folder_name):
     """
     Limpia y analiza el nombre del directorio para extraer un título, slug, descripción y etiquetas de calidad.
     """
-    # Descartar prefijo de ID si es numérico
+    
     parts = folder_name.split("_", 1)
     if len(parts) > 1 and parts[0].isdigit():
         text = parts[1]
     else:
         text = folder_name
         
-    # Separar por caracter de pleca si existe
     if "¦" in text:
         subparts = text.split("¦")
         part1 = subparts[0].strip()
         part2 = subparts[1].strip()
         
-        # Si la parte 1 es sólo ruido de autoría o muy corta, usar la parte 2
         clean_part1 = part1.replace("((NOT MINE))", "").replace("(NOT MINE)", "").strip()
         if len(clean_part1) < 4 or clean_part1.lower() == "not mine":
             title = part2.split(",")[0].strip()
@@ -123,21 +110,18 @@ def parse_folder_name(folder_name):
         title = text.strip()
         description = text.strip()
         
-    # Limpieza final del título
     title = title.replace("((NOT MINE))", "").replace("(NOT MINE)", "").strip()
     title = title.strip(" ¦,-_")
     title = title.capitalize()
     if not title:
         title = "Publicación de LookBook"
         
-    # Generar un slug único
     slug = title.lower()
     slug = re.sub(r'[^a-z0-9\s-]', '', slug)
     slug = re.sub(r'[\s-]+', '-', slug).strip('-')
     if not slug:
         slug = f"pin-{random.randint(1000, 9999)}"
         
-    # Generar tags a partir del texto
     if "," in description:
         tags_list = [t.strip().lower() for t in description.split(",")]
     else:
@@ -170,7 +154,6 @@ def seed_database_structure():
     
     session = Session(engine)
     
-    # 1. Poblar Categorías
     db_categories = {}
     for cat_data in CATEGORIES_LIST:
         existing = session.exec(select(Category).where(Category.name == cat_data["name"])).first()
@@ -188,7 +171,6 @@ def seed_database_structure():
         else:
             db_categories[existing.name] = existing.id
             
-    # 2. Poblar Usuarios
     db_users = {}
     category_users_map = {cat["name"]: [] for cat in CATEGORIES_LIST}
     
@@ -220,7 +202,6 @@ def run_import(limit=150):
     """
     db_categories, db_users, category_users_map = seed_database_structure()
     
-    # Conexión con S3
     s3 = boto3.client(
         's3',
         aws_access_key_id=ACCESS_KEY,
@@ -238,7 +219,6 @@ def run_import(limit=150):
         if os.path.isdir(os.path.join(safe_source_dir, d))
     ]
     
-    # Mezclar carpetas para distribuir la inserción de forma variada y realista
     random.shuffle(subdirs)
     
     session = Session(engine)
@@ -255,23 +235,19 @@ def run_import(limit=150):
         if not image_path:
             continue
             
-        # Detectar Categoría
         cat_name = detect_category(folder_name)
         cat_id = db_categories.get(cat_name)
         if not cat_id:
             continue
             
-        # Seleccionar usuario temático
         users_for_cat = category_users_map.get(cat_name, [])
         if not users_for_cat:
             user_id = random.choice(list(db_users.values()))
         else:
             user_id = random.choice(users_for_cat)
             
-        # Extraer metadatos limpios
         title, slug, description, tags = parse_folder_name(folder_name)
         
-        # Subir imagen a S3
         file_ext = os.path.splitext(image_path)[1].lower()
         s3_key = f"pins/{slug}-{random.randint(1000, 9999)}{file_ext}"
         
@@ -283,7 +259,7 @@ def run_import(limit=150):
             
         image_url = None
         try:
-            # Intento de subida con ACL public-read
+            
             s3.upload_file(
                 image_path,
                 BUCKET_NAME,
@@ -292,7 +268,7 @@ def run_import(limit=150):
             )
             image_url = f"https://{BUCKET_NAME}.s3.amazonaws.com/{s3_key}"
         except Exception as e:
-            # Reintento sin ACL si falla por políticas del bucket
+            
             print(f"  Aviso: Carga con ACL falló. Reintentando sin ACL...")
             try:
                 s3.upload_file(
@@ -309,7 +285,6 @@ def run_import(limit=150):
             print(f"  FALLÓ la carga a S3. Saltando pin...")
             continue
             
-        # Crear objeto Pin
         new_pin = Pin(
             title=title,
             slug=slug,
@@ -335,7 +310,7 @@ def run_import(limit=150):
     print(f"==========================================")
 
 if __name__ == "__main__":
-    # Puedes ajustar el límite de subidas aquí. Por defecto procesará hasta 150 pines.
+    
     import_limit = 150
     if len(sys.argv) > 1:
         try:

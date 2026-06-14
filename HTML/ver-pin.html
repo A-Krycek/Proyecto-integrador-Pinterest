@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Idea Seleccionada | LookBook</title>
-    <link rel="stylesheet" href="../CSS/es.css">
+    <script src="https://code.jquery.com/jquery-4.0.0.min.js"></script>
+    <script src="../js/design.js?v=2"></script>
 </head>
 <body>
     <header class="linea-principal" id="linea-perfil">
@@ -33,7 +34,7 @@
         
         <section class="tarjeta-pin-detalle">
             <div class="pin-detalle-imagen">
-                <img src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='700'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%238A2387;stop-opacity:1' /%3E%3Cstop offset='50%25' style='stop-color:%23E94057;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23F27121;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23grad)'/%3E%3Ctext x='50%25' y='50%25' fill='%23ffffff' font-family='sans-serif' font-weight='bold' font-size='24' text-anchor='middle'%3EInspira tu Creatividad%3C/text%3E%3Ctext x='50%25' y='55%25' fill='%23ffffff' font-family='sans-serif' font-size='14' opacity='0.8' text-anchor='middle'%3ELookBook Curator%3C/text%3E%3C/svg%3E" alt="Idea Seleccionada">
+                <img src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='700'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%238A2387' stop-opacity='1' /%3E%3Cstop offset='50%25' stop-color='%23E94057' stop-opacity='1' /%3E%3Cstop offset='100%25' stop-color='%23F27121' stop-opacity='1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23grad)'/%3E%3Ctext x='50%25' y='50%25' fill='%23ffffff' font-family='sans-serif' font-weight='bold' font-size='24' text-anchor='middle'%3EInspira tu Creatividad%3C/text%3E%3Ctext x='50%25' y='55%25' fill='%23ffffff' font-family='sans-serif' font-size='14' opacity='0.8' text-anchor='middle'%3ELookBook Curator%3C/text%3E%3C/svg%3E" alt="Idea Seleccionada">
             </div>
 
             <div class="pin-detalle-info">
@@ -47,26 +48,31 @@
                 </p>
 
                 <div class="pin-detalle-creador">
-                    <a href="#" id="creador-perfil-link" style="display: flex; align-items: center; text-decoration: none; color: inherit; gap: 10px;">
-                        <div class="avatar-placeholder">DP</div>
-                        <div class="creador-info">
-                            <span class="creador-nombre" id="creador-nombre-txt">Usuario</span>
-                            <span class="creador-seguidores" id="creador-seguidores-count">0 seguidores</span>
-                        </div>
-                    </a>
-                    <button class="boton-seguir" id="btn-seguir-usuario">Seguir</button>
+                    <div class="avatar-placeholder">DP</div>
+                    <div class="creador-info">
+                        <span class="creador-nombre">Diego Paz</span>
+                        <span class="creador-seguidores">2.4k seguidores</span>
+                    </div>
+                    <button class="boton-seguir">Seguir</button>
                 </div>
 
                 <div class="pin-detalle-comentarios">
-                    <h3 id="comentarios-titulo">Comentarios (0)</h3>
+                    <h3>Comentarios (2)</h3>
                     
-                    <div class="lista-comentarios" id="contenedor-comentarios">
-                        <!-- Comentarios cargados dinámicamente -->
+                    <div class="lista-comentarios">
+                        <div class="comentario-item">
+                            <span class="comentario-autor">Ana Gómez:</span>
+                            <span>Me encanta el balance de colores y la simetría. Muy limpio.</span>
+                        </div>
+                        <div class="comentario-item">
+                            <span class="comentario-autor">Carlos Ramos:</span>
+                            <span>Excelente trabajo con la proporción. Inspirador.</span>
+                        </div>
                     </div>
 
-                    <form class="formulario-comentario" id="form-comentario">
-                        <div class="avatar-placeholder" id="comentario-avatar-usuario">U</div>
-                        <input type="text" id="input-nuevo-comentario" class="input-comentario" placeholder="Añadir un comentario..." required>
+                    <form class="formulario-comentario">
+                        <div class="avatar-placeholder">U</div>
+                        <input type="text" class="input-comentario" placeholder="Añadir un comentario..." required>
                         <button type="submit" class="boton-enviar-comentario" aria-label="Enviar">💬</button>
                     </form>
                 </div>
@@ -75,7 +81,7 @@
 
         <section class="perfil-seccion-pines">
             <h2 class="seccion-titulo-recomendados">Más ideas como esta</h2>
-            <div class="perfil-mosaico mosaico-recomendado" id="mosaico-recomendado">
+            <div class="perfil-mosaico mosaico-recomendado">
                 <article class="pin-tarjeta">
                     <div class="pin-imagen-contenedor">
                         <img src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='400'%3E%3Crect width='100%25' height='100%25' fill='%23272727'/%3E%3Ctext x='50%25' y='50%25' fill='%238e8e93' font-family='sans-serif' font-weight='bold' font-size='20' text-anchor='middle'%3EPerrito Feliz%3C/text%3E%3C/svg%3E" alt="Mascota" class="pin-imagen">
@@ -127,6 +133,9 @@
     <footer>
         <p class="footer-generico">&copy; 2026 LookBook - Proyecto Integrador</p>
     </footer>
+
+    <div id="toast-container"></div>
+
     <script src="../js/auth.js?v=2"></script>
     <script src="../js/pin-detail.js?v=2"></script>
 </body>
