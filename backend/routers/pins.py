@@ -2,9 +2,9 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session, select
 from sqlalchemy.sql.expression import func
-from db import get_session, engine
+from db import get_session
 from models import Pin, Category, User
-from schemas.pin import PinCreate, PinUpdate
+from schemas.pin import PinCreate
 from utils.moderation import auto_generate_tags, analyze_content_heuristics
 import boto3
 
@@ -118,40 +118,7 @@ def create_pin(pin: PinCreate, session: Session = Depends(get_session)):
     session.refresh(new_pin)
     return sign_pin_url(new_pin)
 
-@router.patch("/{pin_id}", response_model=Pin)
-def update_pin(pin_id: int, data: PinUpdate, session: Session = Depends(get_session)):
-    pin = session.get(Pin, pin_id)
-    if not pin:
-        raise HTTPException(status_code=404, detail="Publicación no encontrada")
-        
-    pin.sqlmodel_update(data.model_dump(exclude_unset=True))
-    
-    category = session.get(Category, pin.category_id)
-    category_name = category.name if category else ""
-    
-    ai_tags = auto_generate_tags(pin.title, pin.description, category_name)
-    user_tags_list = [t.strip().lower() for t in pin.tags.split(",") if t.strip()]
-    merged_tags = list(set(user_tags_list + ai_tags))
-    pin.tags = ", ".join(merged_tags)
-    
-    is_approved, reason = analyze_content_heuristics(
-        title=pin.title,
-        description=pin.description,
-        tags=pin.tags,
-        image_url=pin.image_url
-    )
-    
-    if is_approved:
-        pin.status = "approved"
-        pin.moderation_reason = None
-    else:
-        pin.status = "rejected"
-        pin.moderation_reason = reason
-        
-    session.add(pin)
-    session.commit()
-    session.refresh(pin)
-    return sign_pin_url(pin)
+
 
 @router.delete("/{pin_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_pin(pin_id: int, user_id: int, session: Session = Depends(get_session)):
