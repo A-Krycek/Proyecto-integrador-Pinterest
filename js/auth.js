@@ -97,6 +97,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Lógica para Registrarse
     const formRegistro = document.getElementById("formulario-registro");
+    const errorRegistro = document.getElementById("error-registro");
+    const successRegistro = document.getElementById("success-registro");
+    const btnEnviarRegistro = document.getElementById("boton-enviar-registro");
     if (formRegistro) {
         formRegistro.addEventListener("submit", async (e) => {
             e.preventDefault();
@@ -105,8 +108,23 @@ document.addEventListener("DOMContentLoaded", () => {
             const password = document.getElementById("contrasena-registro").value;
             const confirmPass = document.getElementById("contrasena-confirmar").value;
             
+            if (errorRegistro) {
+                errorRegistro.style.display = "none";
+                errorRegistro.textContent = "";
+            }
+            if (successRegistro) {
+                successRegistro.style.display = "none";
+                successRegistro.textContent = "";
+            }
+            
             if (password !== confirmPass) {
-                alert("Las contraseñas no coinciden.");
+                const passMsg = "Las contraseñas no coinciden.";
+                if (errorRegistro) {
+                    errorRegistro.textContent = passMsg;
+                    errorRegistro.style.display = "block";
+                } else {
+                    alert(passMsg);
+                }
                 return;
             }
             
@@ -121,15 +139,38 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 if (!response.ok) {
                     const err = await response.json();
-                    alert(err.detail || "Error al registrarse");
+                    const errMsg = err.detail || "Error al registrarse";
+                    if (errorRegistro) {
+                        errorRegistro.textContent = errMsg;
+                        errorRegistro.style.display = "block";
+                    } else {
+                        alert(errMsg);
+                    }
                     return;
                 }
                 
-                alert("¡Cuenta creada con éxito! Ahora inicia sesión.");
-                window.location.href = "iniciar-sesion.html";
+                const successMsg = "¡Cuenta creada con éxito! Redirigiendo al inicio de sesión...";
+                if (successRegistro) {
+                    successRegistro.textContent = successMsg;
+                    successRegistro.style.display = "block";
+                    if (btnEnviarRegistro) btnEnviarRegistro.disabled = true;
+                } else {
+                    alert(successMsg);
+                }
+                
+                setTimeout(() => {
+                    window.location.href = "iniciar-sesion.html";
+                }, 2000);
+                
             } catch (error) {
                 console.error("Error al registrarse:", error);
-                alert("No se pudo conectar con el servidor.");
+                const netMsg = "No se pudo conectar con el servidor.";
+                if (errorRegistro) {
+                    errorRegistro.textContent = netMsg;
+                    errorRegistro.style.display = "block";
+                } else {
+                    alert(netMsg);
+                }
             }
         });
     }
