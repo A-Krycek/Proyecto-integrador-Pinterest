@@ -184,10 +184,10 @@ function renderizarPinesLista(pines) {
             </div>
         `);
 
-        $article.find(".boton-eliminar-pin").on("click", async function(e) {
+        $article.find(".boton-eliminar-pin").on("click", function(e) {
             e.preventDefault();
             e.stopPropagation();
-            if (confirm("¿Estás seguro de que deseas eliminar esta publicación?")) {
+            mostrarConfirmacionEliminar(async function() {
                 try {
                     const userStr = localStorage.getItem("user");
                     if (!userStr) return;
@@ -211,7 +211,7 @@ function renderizarPinesLista(pines) {
                     console.error("Error al eliminar publicación:", error);
                     showToast("Error", "No se pudo conectar con el servidor.", "error");
                 }
-            }
+            });
         });
 
         $article.find(".boton-guardar-pin").on("click", function(e) {
@@ -305,6 +305,39 @@ async function abrirModalLista(tipo, userId) {
         console.error("Error al cargar lista:", error);
         showToast("Error", "No se pudo cargar la lista de usuarios.", "error");
     }
+}
+
+function mostrarConfirmacionEliminar(onConfirm) {
+    $(".modal-backdrop").remove();
+    const modalHtml = `
+        <div class="modal-backdrop" id="modal-confirmacion-eliminar">
+            <div class="modal-contenido">
+                <h3 class="modal-titulo">¿Seguro desea eliminar?</h3>
+                <p style="color: #8C533E; font-size: 0.95rem; margin-bottom: 24px; line-height: 1.5; text-align: center;">
+                    Esta acción es permanente y no se podrá deshacer.
+                </p>
+                <div class="modal-acciones">
+                    <button class="boton-accion-cancelar" id="btn-cancelar-eliminar">Cancelar</button>
+                    <button class="boton-enviar" id="btn-confirmar-eliminar" style="background-color: #e11d48;">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    `;
+    $("body").append(modalHtml);
+    applyStyles();
+
+    $("#btn-cancelar-eliminar").on("click", function() {
+        $("#modal-confirmacion-eliminar").fadeOut(200, function() {
+            $(this).remove();
+        });
+    });
+
+    $("#btn-confirmar-eliminar").on("click", function() {
+        $("#modal-confirmacion-eliminar").fadeOut(200, function() {
+            $(this).remove();
+        });
+        onConfirm();
+    });
 }
 
 $(function() {
