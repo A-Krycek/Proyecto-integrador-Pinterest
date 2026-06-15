@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Perfil | LookBook</title>
-
-    <link rel="stylesheet" href="../CSS/es.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="../js/design.js?v=2"></script>
 </head>
 
 <body>
@@ -76,13 +76,14 @@
             <h1 class="perfil-nombre-completo" id="txt-nombre-completo">Usuario Invitado</h1>
             <p class="nombre-usuario" id="nombre-usuario-perfil">@usuario_invitado</p>
             <p class="perfil-biografia" id="biografia-usuario-perfil">¡Bienvenido a tu perfil de LookBook! Aquí se mostrarán tus pines creados y guardados.</p>
-            <div class="perfil-seguidores-info" style="margin-bottom: 15px; font-size: 0.95rem; color: var(--text-secondary); display: flex; gap: 15px; font-weight: 600;">
-                <span id="seguidores-count">0 seguidores</span>
-                <span id="seguidos-count">0 seguidos</span>
+            <div class="perfil-seguidores-info" style="margin: 10px 0 16px; font-size: 0.95rem; color: #8C533E; display: flex; gap: 15px; font-weight: 600; justify-content: center;">
+                <span id="contador-seguidores">0 seguidores</span>
+                <span id="contador-seguidos">0 seguidos</span>
             </div>
             <div class="perfil-acciones">
                 <button class="boton-accion-secundario" id="btn-compartir-perfil">Compartir</button>
                 <button class="boton-accion-secundario" id="btn-editar-perfil">Editar Perfil</button>
+                <button id="btn-seguir-perfil" style="display: none;">Seguir</button>
             </div>
         </section>
         <nav class="perfil-pestañas" id="pestañas-navegacion-perfil">
@@ -90,69 +91,17 @@
       <div class="pestaña-creados" id="pestana-creados-perfil">Creados</div>
     </nav>
         <section class="perfil-mosaico" id="perfil-mosaico-pines">
-            <article class="pin-tarjeta">
-                <div class="pin-imagen-contenedor">
-                    <img src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='600'%3E%3Crect width='100%25' height='100%25' fill='%231e1e24'/%3E%3Ctext x='50%25' y='50%25' fill='%238e8e93' font-family='sans-serif' font-weight='bold' font-size='20' text-anchor='middle'%3EDise%C3%B1o Minimalista%3C/text%3E%3C/svg%3E" alt="Diseño Minimalista" class="pin-imagen">
-                    <div class="pin-overlay">
-                        <button class="boton-guardar-pin">Guardar</button>
-                        <a href="ver-pin.html" class="pin-overlay-link-cover" aria-label="Ver detalle"></a>
-                    </div>
-                </div>
-                <div class="pin-info">
-                    <a href="ver-pin.html" class="pin-titulo-link">
-                        <h3 class="pin-titulo-mini">Diseño Minimalista</h3>
-                    </a>
-                </div>
-            </article>
-
-            <article class="pin-tarjeta">
-                <div class="pin-imagen-contenedor">
-                    <img src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='550'%3E%3Crect width='100%25' height='100%25' fill='%23222831'/%3E%3Ctext x='50%25' y='50%25' fill='%238e8e93' font-family='sans-serif' font-weight='bold' font-size='20' text-anchor='middle'%3EInteriores Modernos%3C/text%3E%3C/svg%3E" alt="Interiores Modernos" class="pin-imagen">
-                    <div class="pin-overlay">
-                        <button class="boton-guardar-pin">Guardar</button>
-                        <a href="ver-pin.html" class="pin-overlay-link-cover" aria-label="Ver detalle"></a>
-                    </div>
-                </div>
-                <div class="pin-info">
-                    <a href="ver-pin.html" class="pin-titulo-link">
-                        <h3 class="pin-titulo-mini">Interiores Modernos</h3>
-                    </a>
-                </div>
-            </article>
+            <!-- Las publicaciones se cargan dinámicamente mediante JS -->
         </section>
 
     </main>
-
-    <!-- Modal de Editar Perfil -->
-    <div id="modal-editar-perfil" class="modal-contenedor" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 1000; align-items: center; justify-content: center;">
-        <div class="modal-contenido" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 24px; padding: 30px; width: 90%; max-width: 480px; box-shadow: var(--shadow-lg);">
-            <h2 style="margin-top: 0; margin-bottom: 20px; font-size: 1.5rem; font-weight: 800; color: var(--text-primary);">Editar Perfil</h2>
-            <form id="form-editar-perfil">
-                <div class="grupo-formulario" style="margin-bottom: 15px;">
-                    <label for="edit-nombre" class="label-formulario">Nombre de usuario</label>
-                    <input type="text" id="edit-nombre" class="input-formulario" required style="width: 100%; box-sizing: border-box; background-color: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border-color); padding: 10px; border-radius: var(--radius-md);">
-                </div>
-                <div class="grupo-formulario" style="margin-bottom: 15px;">
-                    <label for="edit-bio" class="label-formulario">Biografía</label>
-                    <textarea id="edit-bio" class="crear-textarea" style="width: 100%; height: 80px; box-sizing: border-box; resize: none; background-color: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border-color); padding: 10px; border-radius: var(--radius-md); font-family: inherit;"></textarea>
-                </div>
-                <div class="grupo-formulario" style="margin-bottom: 20px;">
-                    <label for="edit-foto" class="label-formulario">Foto de perfil (URL de imagen o Base64)</label>
-                    <input type="text" id="edit-foto" class="input-formulario" placeholder="Ej. http://... o deja en blanco" style="width: 100%; box-sizing: border-box; background-color: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border-color); padding: 10px; border-radius: var(--radius-md);">
-                </div>
-                <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                    <button type="button" class="boton-accion-cancelar" id="btn-cancelar-edicion" style="border: 1px solid var(--border-color); background-color: var(--bg-tertiary); color: var(--text-primary); padding: 10px 16px; border-radius: var(--radius-full); cursor: pointer; font-weight: 600;">Cancelar</button>
-                    <button type="submit" class="boton-enviar" style="padding: 10px 16px; border-radius: var(--radius-full); cursor: pointer;">Guardar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <footer>
         <p class="footer-generico">&copy; 2026 LookBook - Proyecto Integrador</p>
     </footer>
+
+    <div id="toast-container"></div>
+
     <script src="../js/auth.js?v=2"></script>
     <script src="../js/profile.js?v=2"></script>
 </body>
-
 </html>
