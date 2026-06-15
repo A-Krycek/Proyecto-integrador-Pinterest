@@ -23,8 +23,8 @@ def seed():
         session.refresh(cat3)
 
         # 2. Create users
-        user1 = User(username="danixdy8", email="danixdy8@gmail.com", password="password", bio="Amante de la arquitectura moderna", profile_pic="")
-        user2 = User(username="krycek", email="krycek@gmail.com", password="password", bio="Curador de diseño minimalista", profile_pic="")
+        user1 = User(username="danixdy8", email="danixdy8@gmail.com", password="password", bio="Amante de la arquitectura moderna", avatar_url=None)
+        user2 = User(username="krycek", email="krycek@gmail.com", password="password", bio="Curador de diseño minimalista", avatar_url=None)
         session.add(user1)
         session.add(user2)
         session.commit()
