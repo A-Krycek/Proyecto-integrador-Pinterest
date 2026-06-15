@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro</title>
-    <link rel="stylesheet" href="../CSS/es.css">
-
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="../js/design.js?v=2"></script>
 </head>
 
 <body class="cuerpo-autenticacion">
@@ -65,7 +65,6 @@
                 </div>
                 <button type="submit" class="boton-enviar" id="boton-enviar-registro">Registrarse</button>
             </form>
-            <div class="separador-autenticacion" id="separador-formulario">o continua con</div>
             <div class="footer-contenedor-autenticacion">
                 ¿Ya tienes una cuenta? <a href="iniciar-sesion.html" class="link-autenticacion"
                     id="link-iniciar-sesion">Inicia Sesión aquí</a>
@@ -76,7 +75,9 @@
     <footer>
         <p>&copy; 2026 LookBook - Proyecto Integrador</p>
     </footer>
+
+    <div id="toast-container"></div>
+
     <script src="../js/auth.js"></script>
 </body>
-
 </html>
