@@ -321,6 +321,7 @@ async function cargarRecomendaciones(categoryId, artistId, currentPinId, tagsStr
 
 function renderizarRecomendaciones(pines) {
     const $mosaico = $(".mosaico-recomendado");
+    $mosaico.attr('data-pin-count', pines.length);
     $mosaico.empty();
 
     if (pines.length === 0) {

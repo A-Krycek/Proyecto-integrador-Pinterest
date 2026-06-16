@@ -92,6 +92,7 @@ async function cargarMisPines(userId) {
 
 function renderizarPinesLista(pines) {
     const $mosaico = $("#perfil-mosaico-pines");
+    $mosaico.attr('data-pin-count', pines.length);
     $mosaico.empty();
 
     if (pines.length === 0) {

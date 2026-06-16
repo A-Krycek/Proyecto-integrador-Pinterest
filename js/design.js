@@ -212,10 +212,37 @@ function applyStyles() {
         'border-color': '#B1BF49'
     });
 
-    $('.perfil-mosaico').css({
-        'column-count': '5',
-        'column-gap': '16px',
-        'width': '100%'
+    const $mosaico = $('.perfil-mosaico');
+    const pinCount = parseInt($mosaico.attr('data-pin-count') || '0', 10);
+    const windowWidth = $(window).width();
+    
+    let colCount = 5;
+    let colGap = 16;
+    let colWidth = 250;
+    
+    const availableWidth = windowWidth - 48; // Descontar padding lateral (24px de cada lado)
+
+    if (windowWidth <= 768) {
+        colWidth = 160;
+        colGap = 12;
+        const colsThatFit = Math.floor((availableWidth + colGap) / (colWidth + colGap));
+        colCount = Math.max(1, Math.min(2, colsThatFit)); // Máximo 2 columnas en móvil
+    } else {
+        const colsThatFit = Math.floor((availableWidth + colGap) / (colWidth + colGap));
+        colCount = Math.max(1, Math.min(5, colsThatFit)); // Máximo 5 columnas en desktop
+    }
+    
+    if (pinCount > 0) {
+        colCount = Math.min(colCount, pinCount);
+    }
+    
+    $mosaico.css({
+        'column-width': colWidth + 'px',
+        'column-count': colCount,
+        'column-gap': colGap + 'px',
+        'width': 'fit-content',
+        'max-width': '100%',
+        'margin': '0 auto'
     });
 
     $('.pin-tarjeta').css({
@@ -1104,9 +1131,7 @@ function applyStyles() {
         $('.linea-perfil a').css({ 'padding': '8px 12px', 'font-size': '0.88rem' });
         $('.boton-enviar-cerrar-sesion').css({ 'padding': '6px 12px', 'font-size': '0.85rem' });
         $('.avatar-placeholder').css({ 'width': '36px', 'height': '36px', 'font-size': '1rem' });
-        $('.perfil-mosaico').css({ 'column-count': '2', 'column-gap': '12px' });
         $('.contenedor-crear').css('grid-template-columns', '1fr');
-        $('.mosaico-recomendado').css('column-count', '2');
         $('.tarjeta-pin-detalle').css('grid-template-columns', '1fr');
     }
 

@@ -1,4 +1,4 @@
-let API_URL = "http://127.0.0.1:8000/api";
+let API_URL = "http://18.206.173.189/api";
 
 function obtenerLlaveGuardados() {
     const userStr = localStorage.getItem("user");

@@ -28,6 +28,7 @@ async function cargarFeed(query = "", categoryId = null) {
             return;
         }
 
+        $mosaico.attr('data-pin-count', pines.length);
         $mosaico.empty(); 
         pines.forEach(pin => {
             const $article = $("<article>").addClass("pin-tarjeta");
